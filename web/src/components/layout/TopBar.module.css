@@ -1,0 +1,39 @@
+.topbar {
+  width: min(calc(100% - 32px), var(--max));
+  margin: 0 auto;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 20;
+}
+.brand { justify-self: start; display: inline-flex; gap: 8px; align-items: center; font-weight: 850; letter-spacing: -.03em; }
+.brand span { color: var(--muted); font-weight: 600; }
+.brandDot { width: 11px; height: 11px; border-radius: 50%; background: var(--red); box-shadow: 0 0 16px rgba(239,43,36,.55); }
+.nav { display: flex; gap: 28px; color: #b9b6b0; font-size: 13px; justify-self: center; }
+.nav a:hover { color: #fff; }
+.actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
+.networkPill, .walletBtn, .soundBtn {
+  border: 1px solid var(--line);
+  background: #111;
+  height: 38px;
+  padding: 0 13px;
+  font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .07em;
+  cursor: pointer;
+}
+.networkPill { color: #aaa69e; }
+.soundBtn { color: #77736d; padding: 0 11px; font-size: 9px; }
+.soundBtn[aria-pressed="true"] { color: #f2efe8; border-color: #4a4a4a; }
+.walletBtn { background: var(--ink); color: #090909; border-color: var(--ink); }
+.walletBtn:hover { background: white; }
+
+@media (max-width: 900px) {
+  .topbar { grid-template-columns: 1fr auto; min-height: 64px; }
+  .nav, .networkPill, .soundBtn { display: none; }
+}
+@media (max-width: 640px) {
+  .walletBtn { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+}

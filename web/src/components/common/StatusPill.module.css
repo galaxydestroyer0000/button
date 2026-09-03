@@ -1,0 +1,15 @@
+.line {
+  margin-top: 22px;
+  color: #8c8983;
+  font-size: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #777; }
+.dot.live { background: #54d27a; box-shadow: 0 0 15px rgba(84,210,122,.55); }
+.dot.dead { background: var(--red); }
+.dot.stale { background: var(--yellow); }

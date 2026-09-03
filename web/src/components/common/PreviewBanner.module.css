@@ -1,0 +1,12 @@
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #f4d03f;
+  color: #080808;
+  text-align: center;
+  font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .16em;
+  padding: 9px 12px;
+  border-bottom: 1px solid #080808;
+}

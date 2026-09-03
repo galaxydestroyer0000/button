@@ -1,0 +1,21 @@
+.strip {
+  width: min(calc(100% - 32px), var(--max));
+  margin: 0 auto;
+  min-height: 84px;
+  border: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #5f5c57;
+  font: 750 9px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .1em;
+}
+.strip span { display: flex; gap: 6px; align-items: center; }
+.strip code { color: #dedbd4; }
+
+@media (max-width: 640px) {
+  .strip { padding: 12px; }
+}
