@@ -1,0 +1,54 @@
+.stage { width: 390px; height: 390px; display: grid; place-items: center; position: relative; margin-top: -5px; z-index: 3; }
+.dial { position: absolute; inset: 8px; border-radius: 50%; }
+.dial::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -3deg, rgba(255,255,255,.34) 0deg 1deg, transparent 1deg 6deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 68%, black 68% 70%, transparent 70%);
+  mask: radial-gradient(circle, transparent 0 68%, black 68% 70%, transparent 70%);
+  opacity: .4;
+}
+.plinth {
+  width: 246px; height: 246px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 28%, #525252 0, #282828 38%, #121212 72%, #050505 100%);
+  border: 1px solid #595959;
+  box-shadow: 0 38px 70px rgba(0,0,0,.72), inset 0 0 0 8px #171717, inset 0 0 0 10px #474747;
+  position: relative;
+}
+.plinth::after { content: "IRREVERSIBLE"; position: absolute; bottom: -35px; color: #5e5b57; font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .28em; }
+.button {
+  width: 176px; height: 176px; border-radius: 50%; border: 1px solid #ff7772;
+  background:
+    radial-gradient(circle at 38% 28%, #ff756d 0 7%, transparent 8%),
+    radial-gradient(circle at 50% 35%, #ff4038 0, #e82019 40%, #ab100c 72%, #650703 100%);
+  box-shadow:
+    inset 0 7px 13px rgba(255,255,255,.22),
+    inset 0 -18px 28px rgba(75,0,0,.58),
+    0 13px 0 #5b0906,
+    0 20px 28px rgba(0,0,0,.7),
+    0 0 48px rgba(239,43,36,.18);
+  position: relative;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .2s ease;
+}
+.button:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-2px); }
+.button:active:not(:disabled) { transform: translateY(10px); box-shadow: inset 0 7px 13px rgba(255,255,255,.16), inset 0 -10px 20px rgba(75,0,0,.6), 0 3px 0 #5b0906, 0 9px 16px rgba(0,0,0,.75); }
+.button:focus-visible { outline: 3px solid #fff; outline-offset: 8px; }
+.button:disabled { cursor: not-allowed; filter: grayscale(.78) brightness(.54); box-shadow: inset 0 5px 14px rgba(255,255,255,.08), inset 0 -14px 24px rgba(0,0,0,.75), 0 8px 0 #222, 0 14px 22px rgba(0,0,0,.62); }
+.copy { font: 900 23px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-shadow: 0 1px 2px rgba(0,0,0,.7); }
+.glare { position: absolute; width: 82px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.1); filter: blur(7px); top: 22px; left: 47px; transform: rotate(-8deg); }
+
+@media (max-width: 900px) {
+  .stage { width: 310px; height: 310px; }
+  .plinth { width: 214px; height: 214px; }
+  .button { width: 150px; height: 150px; }
+}
+@media (max-width: 640px) {
+  .stage { width: 285px; height: 285px; }
+  .dial::before { opacity: .2; }
+  .plinth { width: 190px; height: 190px; }
+  .button { width: 132px; height: 132px; }
+  .copy { font-size: 18px; }
+}

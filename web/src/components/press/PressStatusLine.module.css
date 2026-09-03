@@ -1,0 +1,13 @@
+.kicker { display: flex; gap: 11px; color: #a29f98; font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.kicker .arrow { color: var(--red); }
+.rule { margin-top: 4px; font-weight: 650; letter-spacing: .025em; font-size: 14px; }
+.rule strong { color: var(--red); }
+.identity { margin-top: 12px; font-size: 10px; color: #8c8982; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.txStatus { min-height: 22px; margin-top: 13px; color: #dbd8d0; font-size: 10px; }
+.postPress { margin-top: 10px; border: 1px solid var(--line); background: #0e0e0e; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+.postPress strong { font: 800 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
+.postPress button, .postPress a { border: 1px solid #3a3a3a; background: #171717; color: #ddd; padding: 8px 10px; font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace; cursor: pointer; }
+
+@media (max-width: 640px) {
+  .kicker { font-size: 8px; }
+}

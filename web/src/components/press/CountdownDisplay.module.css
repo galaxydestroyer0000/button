@@ -1,0 +1,18 @@
+.wrap { margin-top: 37px; position: relative; z-index: 2; text-align: center; }
+.systemLabel { color: #6f6c67; font-size: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.timer {
+  margin-top: 8px;
+  font: 800 clamp(70px, 11vw, 158px)/.88 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: -.085em;
+  font-variant-numeric: tabular-nums;
+  color: #f7f4ed;
+  text-shadow: 0 0 45px rgba(255,255,255,.08);
+}
+.timer.urgent { color: #ff5b54; text-shadow: 0 0 36px rgba(239,43,36,.38); }
+.timer.critical { animation: criticalPulse .55s steps(2,end) infinite; }
+@keyframes criticalPulse { 50% { opacity: .58; } }
+.deadlineLabel { margin-top: 11px; color: #696660; font-size: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+
+@media (max-width: 640px) {
+  .timer { font-size: clamp(64px,24vw,105px); }
+}
