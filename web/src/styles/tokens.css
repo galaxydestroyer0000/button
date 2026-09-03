@@ -1,0 +1,18 @@
+:root {
+  --bg: #080808;
+  --panel: #101010;
+  --panel-2: #151515;
+  --ink: #f2efe8;
+  --muted: #8e8b85;
+  --line: #292929;
+  --red: #ef2b24;
+  --red-dark: #7f0e0b;
+  --purple: #8b5cf6;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --yellow: #f4d03f;
+  --orange: #f97316;
+  --faction-red: #ef4444;
+  --grey: #858585;
+  --max: 1320px;
+}
