@@ -1865,9 +1865,9 @@ export default function PressStage() {
 
   const deadlineMs = runtimeConfig.previewMode ? preview.deadlineMs : state.loaded ? state.deadline * 1000 - state.chainOffsetMs : null;
   const sealed = runtimeConfig.previewMode ? false : !state.started;
-  const alive = runtimeConfig.previewMode ? !preview.ended : state.started && state.alive;
+  const alive = runtimeConfig.previewMode ? preview.deadlineMs > Date.now() : state.started && state.alive;
   const reading = useCountdown(deadlineMs, { sealed, alive });
-  const previewEnded = runtimeConfig.previewMode && reading.remainingMs === 0 && preview.deadlineMs <= Date.now();
+  const previewEnded = runtimeConfig.previewMode && !alive;
 
   const deadlineLabel = runtimeConfig.previewMode
     ? previewEnded
