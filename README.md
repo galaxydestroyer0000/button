@@ -56,11 +56,10 @@ Deploy to testnet first.
 
 ## Local frontend preview
 
-The frontend requires no npm install.
-
 ```bash
 cd web
-python3 -m http.server 4173
+npm install
+npm run dev
 ```
 
 Open `http://localhost:4173`.
@@ -102,6 +101,8 @@ export VITE_TOKEN_URL='https://your-token-page.example'
 export VITE_PAIR_LABEL='BUTTON / RDDT'
 node scripts/configure.mjs
 ```
+
+In production this file lives at `web/public/config.js` pre-build (Vite copies it into `web/dist/config.js` unchanged), so `node scripts/configure.mjs` continues to work exactly as documented.
 
 Serve the frontend and verify all of these while the contract is sealed:
 
