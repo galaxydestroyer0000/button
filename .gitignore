@@ -9,3 +9,5 @@ web/node_modules/
 contracts/cache/
 contracts/out/
 contracts/lib/
+
+.worktrees/
