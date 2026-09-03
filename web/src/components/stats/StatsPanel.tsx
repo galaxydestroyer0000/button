@@ -5,6 +5,7 @@ import type { ExperimentState, PressEvent } from "../../domain/types";
 import type { PreviewClockState } from "../../hooks/usePreviewClock";
 import StatTile from "./StatTile";
 import FactionBars from "./FactionBars";
+import styles from "./StatsPanel.module.css";
 
 export default function StatsPanel({
   state,
@@ -29,13 +30,13 @@ export default function StatsPanel({
 
   return (
     <section id="stats" aria-label="Experiment stats">
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderLeft: "1px solid var(--line)", borderRight: "1px solid var(--line)" }}>
+      <div className={styles.grid}>
         <StatTile label="TOTAL PRESSES" value={total ? total.toLocaleString() : "—"} caption="one wallet = one press" />
         <StatTile label="EXPERIMENT UPTIME" value={Number.isFinite(ageSeconds) ? formatDuration(ageSeconds) : "—"} caption="since activation" />
         <StatTile label="CLOSEST CALL" value={total ? `${closest}s` : "—"} caption="lowest clock at press" />
         <StatTile label="CURRENT STREAK" value={streak ? String(streak) : "—"} caption="consecutive same-faction presses" />
       </div>
-      <div style={{ marginTop: 1 }}>
+      <div className={styles.latest}>
         <StatTile label="LATEST PRESSER" value={latestPresser ? shortAddress(latestPresser) : "—"} caption="most recent wallet" />
       </div>
       <FactionBars counts={counts} total={total} />
