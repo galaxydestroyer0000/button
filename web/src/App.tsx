@@ -1,3 +1,32 @@
+import AppShell from "./components/layout/AppShell";
+import SystemStrip from "./components/layout/SystemStrip";
+import PressStage from "./components/press/PressStage";
+import LivePressFeed from "./components/feed/LivePressFeed";
+import StatsPanel from "./components/stats/StatsPanel";
+import TokenPanel from "./components/token/TokenPanel";
+import IdentityPanel from "./components/identity/IdentityPanel";
+import RulesSection from "./components/rules/RulesSection";
+import ProofSection from "./components/rules/ProofSection";
+import { useExperimentState } from "./hooks/useExperimentState";
+import { usePressFeed } from "./hooks/usePressFeed";
+import { usePreviewClock } from "./hooks/usePreviewClock";
+import { runtimeConfig } from "./config/runtimeConfig";
+
 export default function App() {
-  return <div>BUTTON — scaffold OK</div>;
+  const state = useExperimentState();
+  const feed = usePressFeed(state);
+  const preview = usePreviewClock();
+  const events = runtimeConfig.previewMode ? preview.events : feed.events;
+
+  return (
+    <AppShell footer={<SystemStrip state={state} />}>
+      <PressStage state={state} feed={feed} preview={preview} />
+      <LivePressFeed feed={feed} preview={runtimeConfig.previewMode ? preview : null} />
+      <StatsPanel state={state} events={events} preview={runtimeConfig.previewMode ? preview : null} />
+      <IdentityPanel preview={preview} />
+      <TokenPanel />
+      <RulesSection />
+      <ProofSection state={state} />
+    </AppShell>
+  );
 }

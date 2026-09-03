@@ -4,20 +4,25 @@ import StatusPill from "../common/StatusPill";
 import CountdownDisplay from "./CountdownDisplay";
 import PressButton from "./PressButton";
 import PressStatusLine from "./PressStatusLine";
-import { useExperimentState } from "../../hooks/useExperimentState";
-import { usePressFeed } from "../../hooks/usePressFeed";
 import { useUserPress } from "../../hooks/useUserPress";
 import { useCountdown } from "../../hooks/useCountdown";
-import { usePreviewClock } from "../../hooks/usePreviewClock";
 import { buttonExperimentAbi } from "../../abi/buttonExperiment";
 import { runtimeConfig } from "../../config/runtimeConfig";
+import type { ExperimentState } from "../../domain/types";
+import type { PressFeed } from "../../hooks/usePressFeed";
+import type { PreviewClockState } from "../../hooks/usePreviewClock";
 import styles from "./PressStage.module.css";
 
-export default function PressStage() {
-  const state = useExperimentState();
-  const feed = usePressFeed(state);
+export default function PressStage({
+  state,
+  feed,
+  preview
+}: {
+  state: ExperimentState;
+  feed: PressFeed;
+  preview: PreviewClockState;
+}) {
   const userPress = useUserPress();
-  const preview = usePreviewClock();
   const { address, isConnected, chainId, connector } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
