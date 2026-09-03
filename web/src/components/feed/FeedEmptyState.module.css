@@ -1,0 +1,7 @@
+.empty {
+  padding: 30px 0;
+  color: #6f6c65;
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}

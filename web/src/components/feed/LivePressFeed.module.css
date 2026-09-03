@@ -1,0 +1,11 @@
+.section { border: 1px solid var(--line); border-top: 0; padding: 58px 48px; }
+.head { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 30px; }
+.head h2 { margin: 6px 0 0; font-size: clamp(28px,4vw,54px); letter-spacing: -.05em; line-height: .95; }
+.eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.freshness { color: #77746e; font-size: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.tape { border-top: 1px solid #343434; }
+
+@media (max-width: 640px) {
+  .section { padding: 40px 18px; }
+  .head { align-items: start; flex-direction: column; gap: 12px; }
+}
