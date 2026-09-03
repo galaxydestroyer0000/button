@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080808" />
+  <meta name="description" content="BUTTON — one wallet, one press, one shared clock on Robinhood Chain." />
+  <title>BUTTON / RDDT — One press forever</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="preview-banner" class="preview-banner hidden">PREVIEW MODE — NOT ONCHAIN</div>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-dot"></span>BUTTON <span>/ RDDT</span></a>
+    <nav>
+      <a href="#rules">Rules</a>
+      <a href="#proof">Contract</a>
+      <a href="./about/">About</a>
+    </nav>
+    <div class="top-actions">
+      <button id="sound-btn" class="sound-btn" type="button" aria-pressed="false">SOUND OFF</button>
+      <button id="network-pill" class="network-pill" type="button">ROBINHOOD · —</button>
+      <button id="wallet-btn" class="wallet-btn" type="button">CONNECT WALLET</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="experiment">
+      <div class="hero-kicker"><span>REDDIT, 2015</span><span class="arrow">→</span><span>ROBINHOOD CHAIN, 2026</span></div>
+      <div class="status-line"><span class="status-dot" id="status-dot"></span><span id="experiment-status">LOADING SHARED STATE</span></div>
+
+      <div class="timer-wrap" aria-live="polite">
+        <div class="system-label">SHARED TIMER · AUTHORITATIVE STATE ONCHAIN</div>
+        <div id="timer" class="timer" role="timer" aria-label="Shared countdown">00:--</div>
+        <div id="deadline-label" class="deadline-label">WAITING FOR CONTRACT</div>
+      </div>
+
+      <div class="button-stage">
+        <div class="dial" id="dial" aria-hidden="true"></div>
+        <div class="button-plinth">
+          <button id="press-btn" class="press-button" type="button" aria-label="Press the Button once forever">
+            <span class="button-glare"></span>
+            <span class="button-copy">PRESS</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-rule">ONE WALLET. ONE PRESS. <strong>FOREVER.</strong></div>
+      <div id="identity-line" class="identity-line">YOU ARE GREY · YOU HAVE NOT PRESSED</div>
+      <div id="tx-status" class="tx-status" aria-live="polite"></div>
+      <div id="post-press" class="post-press hidden"></div>
+    </section>
+
+    <section class="tape-section">
+      <div class="section-head">
+        <div><span class="eyebrow">LIVE TAPE</span><h2>Every press leaves a mark.</h2></div>
+        <span id="tape-freshness" class="freshness">SYNCING</span>
+      </div>
+      <div id="live-tape" class="live-tape"><div class="empty">No presses indexed yet.</div></div>
+    </section>
+
+    <section class="stats-grid" id="stats">
+      <article><span>TOTAL PRESSES</span><strong id="stat-total">—</strong><small>one wallet = one press</small></article>
+      <article><span>TIME ALIVE</span><strong id="stat-age">—</strong><small>since activation</small></article>
+      <article><span>CLOSEST CALL</span><strong id="stat-closest">—</strong><small>lowest clock at press</small></article>
+      <article><span>LATEST PRESSER</span><strong id="stat-latest">—</strong><small>most recent wallet</small></article>
+    </section>
+
+    <section class="factions-section" id="factions">
+      <div class="section-head"><div><span class="eyebrow">FACTIONS</span><h2>Your second becomes your color.</h2></div><p>No names. No leaders. The internet can invent those.</p></div>
+      <div id="faction-list" class="faction-list"></div>
+    </section>
+
+    <section class="rules-section" id="rules">
+      <div class="section-head"><div><span class="eyebrow">THE RULES</span><h2>Four lines. No rescue clause.</h2></div></div>
+      <div class="rules-grid">
+        <article><b>01</b><h3>One wallet gets one press.</h3><p>The contract remembers. Switching browsers changes nothing.</p></article>
+        <article><b>02</b><h3>A press resets the clock to 60.</h3><p>Your transaction buys nobody anything. It only changes shared time.</p></article>
+        <article><b>03</b><h3>At zero, it ends forever.</h3><p>If nobody reaches the chain before the deadline, the experiment is over.</p></article>
+        <article><b>04</b><h3>The contract cannot rescue you.</h3><p>After activation there is no admin reset, extension, fee switch or upgrade.</p></article>
+      </div>
+      <p class="fineprint">Gas is paid in ETH on Robinhood Chain. BUTTON ownership is not required to participate.</p>
+    </section>
+
+    <section class="lore-section">
+      <div class="lore-copy">
+        <span class="eyebrow">BUTTON / RDDT</span>
+        <h2>THE TOKEN IS THE RECEIPT.<br>THE BUTTON IS THE EXPERIMENT.</h2>
+        <p>In 2015, Reddit gave the internet a 60-second timer and one irreversible press. More than a million people turned a button into factions, rituals and panic. BUTTON brings the same primitive onchain: one wallet, one press, one shared clock.</p>
+        <p class="disclaimer">The token does not change your access, odds or result in the experiment.</p>
+        <a id="token-link" class="token-link hidden" href="#" target="_blank" rel="noopener noreferrer">VIEW TOKEN ↗</a>
+      </div>
+      <div class="token-art"><img src="./assets/button-token.png" alt="BUTTON token artwork: a red button and countdown" /></div>
+    </section>
+
+    <section class="proof-section" id="proof">
+      <div class="section-head"><div><span class="eyebrow">PROOF</span><h2>The UI can disappear. The rules remain.</h2></div></div>
+      <div class="proof-grid">
+        <div><span>NETWORK</span><code id="proof-network">—</code></div>
+        <div><span>CHAIN ID</span><code id="proof-chain">—</code></div>
+        <div><span>CONTRACT</span><code id="proof-contract">NOT CONFIGURED</code></div>
+        <div><span>DEPLOY BLOCK</span><code id="proof-block">—</code></div>
+        <div><span>CURRENT BLOCK</span><code id="proof-current">—</code></div>
+        <div><span>RPC</span><code id="proof-rpc">CHECKING</code></div>
+      </div>
+      <a id="explorer-link" class="explorer-link hidden" href="#" target="_blank" rel="noopener noreferrer">OPEN CONTRACT ON BLOCKSCOUT ↗</a>
+    </section>
+  </main>
+
+  <footer><span>BUTTON / RDDT</span><span>ONE PRESS FOREVER</span><span>ROBINHOOD CHAIN</span></footer>
+
+  <script src="./config.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
