@@ -1,0 +1,13 @@
+.list { display: grid; gap: 1px; background: #222; border: 1px solid #2a2a2a; }
+.row { display: grid; grid-template-columns: 18px 130px 110px 1fr 90px; gap: 18px; align-items: center; min-height: 68px; background: #101010; padding: 0 20px; }
+.swatch { width: 10px; height: 42px; background: var(--fc); }
+.name { font: 800 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .09em; }
+.range, .count { color: #8a8780; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.bar { height: 6px; background: #262626; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: var(--pct); background: var(--fc); }
+.count { text-align: right; }
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: 12px 92px 70px 1fr; padding: 0 10px; gap: 8px; }
+  .count { display: none; }
+}

@@ -1,0 +1,7 @@
+.panel { border: 1px solid var(--line); border-top: 0; padding: 32px 48px; display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+.panel span { display: block; color: #77736d; font: 750 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; margin-bottom: 6px; }
+.panel strong { font: 800 13px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.02em; }
+
+@media (max-width: 640px) {
+  .panel { grid-template-columns: 1fr 1fr; padding: 24px 18px; }
+}

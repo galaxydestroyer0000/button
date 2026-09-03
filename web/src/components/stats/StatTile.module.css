@@ -1,0 +1,4 @@
+.tile { min-height: 180px; padding: 32px; border-right: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+.tile span, .tile small { color: #77736d; font: 750 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
+.tile strong { font: 780 clamp(27px,3vw,44px) ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.06em; }
+.tile small { letter-spacing: 0; text-transform: lowercase; }
