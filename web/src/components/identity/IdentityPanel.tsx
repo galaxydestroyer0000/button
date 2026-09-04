@@ -2,13 +2,12 @@ import { useAccount } from "wagmi";
 import { FACTIONS } from "../../domain/factions";
 import { shortAddress } from "../../domain/format";
 import { runtimeConfig } from "../../config/runtimeConfig";
-import { useUserPress } from "../../hooks/useUserPress";
 import type { PreviewClockState } from "../../hooks/usePreviewClock";
+import type { UserPressState } from "../../domain/types";
 import styles from "./IdentityPanel.module.css";
 
-export default function IdentityPanel({ preview }: { preview: PreviewClockState }) {
+export default function IdentityPanel({ preview, userPress }: { preview: PreviewClockState; userPress: UserPressState }) {
   const { address } = useAccount();
-  const userPress = useUserPress();
 
   const hasPressed = runtimeConfig.previewMode ? preview.pressed : userPress.hasPressed;
   const factionId = runtimeConfig.previewMode ? preview.faction : userPress.faction;

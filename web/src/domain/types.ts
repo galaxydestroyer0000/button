@@ -17,6 +17,7 @@ export interface ExperimentState {
   factionCounts: [number, number, number, number, number, number, number];
   currentBlock: number;
   chainOffsetMs: number;
+  error: string | null;
 }
 
 export interface UserPressState {

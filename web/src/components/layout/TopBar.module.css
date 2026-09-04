@@ -30,6 +30,16 @@
 .walletBtn { background: var(--ink); color: #090909; border-color: var(--ink); }
 .walletBtn:hover { background: white; }
 
+.walletError {
+  width: min(calc(100% - 32px), var(--max));
+  margin: 0 auto;
+  padding: 6px 0 0;
+  color: var(--muted);
+  font: 700 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .07em;
+  text-align: right;
+}
+
 @media (max-width: 900px) {
   .topbar { grid-template-columns: 1fr auto; min-height: 64px; }
   .nav, .networkPill, .soundBtn { display: none; }

@@ -11,5 +11,5 @@ const config = `window.BUTTON_CONFIG = {
   tokenUrl: ${q(process.env.VITE_TOKEN_URL || "")},
   pairLabel: ${q(process.env.VITE_PAIR_LABEL || "BUTTON / RDDT")}
 };\n`;
-fs.writeFileSync(path.join(root, "web", "config.js"), config);
-console.log("Wrote web/config.js");
+fs.writeFileSync(path.join(root, "web", "public", "config.js"), config);
+console.log("Wrote web/public/config.js");

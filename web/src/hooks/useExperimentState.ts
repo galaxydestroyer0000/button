@@ -15,7 +15,8 @@ const INITIAL_STATE: ExperimentState = {
   closestCall: 0,
   factionCounts: [0, 0, 0, 0, 0, 0, 0],
   currentBlock: 0,
-  chainOffsetMs: 0
+  chainOffsetMs: 0,
+  error: null
 };
 
 export function useExperimentState(): ExperimentState {
@@ -63,12 +64,19 @@ export function useExperimentState(): ExperimentState {
           closestCall: Number(closestCall),
           factionCounts: [0, ...counts.map((c) => Number(c))] as ExperimentState["factionCounts"],
           currentBlock: Number(block.number),
-          chainOffsetMs
+          chainOffsetMs,
+          error: null
         });
       } catch (error) {
         if (cancelled) return;
         console.warn("Core state refresh failed", error);
-        setState((prev) => ({ ...prev, stale: prev.loaded }));
+        setState((prev) => ({
+          ...prev,
+          stale: prev.loaded,
+          error: prev.loaded
+            ? "RPC DEGRADED · LAST KNOWN STATE PRESERVED"
+            : `RPC ERROR · ${error instanceof Error ? error.message : "UNKNOWN"}`
+        }));
       }
     }
 

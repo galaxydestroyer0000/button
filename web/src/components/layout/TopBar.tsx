@@ -8,8 +8,8 @@ import styles from "./TopBar.module.css";
 
 export default function TopBar() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect, isPending: connecting } = useConnect();
-  const { switchChain } = useSwitchChain();
+  const { connect, connectors, isPending: connecting, error: connectError } = useConnect();
+  const { switchChain, error: switchError } = useSwitchChain();
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
 
   const walletLabel = runtimeConfig.previewMode
@@ -40,33 +40,58 @@ export default function TopBar() {
     switchChain({ chainId: runtimeConfig.network.chainId });
   }
 
+  const rejected =
+    connectError &&
+    ((connectError as unknown as { cause?: { code?: number } })?.cause?.code === 4001 ||
+      (connectError as unknown as { code?: number })?.code === 4001 ||
+      connectError.name === "UserRejectedRequestError");
+
+  const connectionMessage = rejected
+    ? "CONNECTION REJECTED · NOTHING CHANGED"
+    : connectError && connectors.length === 0
+      ? "NO INJECTED EVM WALLET · OPEN IN ROBINHOOD WALLET OR METAMASK BROWSER"
+      : connectError
+        ? `WALLET ERROR · ${connectError.message}`
+        : "";
+
+  const switchMessage = switchError ? `NETWORK SWITCH FAILED · ${switchError.message}` : "";
+
+  const walletErrorMessage = connectionMessage || switchMessage;
+
   return (
-    <header className={styles.topbar}>
-      <a className={styles.brand} href="./">
-        <span className={styles.brandDot} />
-        BUTTON <span>/ RDDT</span>
-      </a>
-      <nav className={styles.nav}>
-        <a href="#experiment">Experiment</a>
-        <a href="#lore">Lore</a>
-        <a href="#stats">Stats</a>
-      </nav>
-      <div className={styles.actions}>
-        <button type="button" className={styles.soundBtn} aria-pressed={soundOn} onClick={toggleSound}>
-          {soundOn ? "SOUND ON" : "SOUND OFF"}
-        </button>
-        <button
-          type="button"
-          className={styles.networkPill}
-          onClick={handleNetworkClick}
-          style={wrongNetwork ? { color: "#f4d03f", borderColor: "#f4d03f" } : undefined}
-        >
-          {wrongNetwork ? "WRONG NETWORK · SWITCH" : networkLabel}
-        </button>
-        <button type="button" className={styles.walletBtn} onClick={handleWalletClick} disabled={connecting}>
-          {walletLabel}
-        </button>
-      </div>
-    </header>
+    <>
+      <header className={styles.topbar}>
+        <a className={styles.brand} href="./">
+          <span className={styles.brandDot} />
+          BUTTON <span>/ RDDT</span>
+        </a>
+        <nav className={styles.nav}>
+          <a href="#experiment">Experiment</a>
+          <a href="#lore">Lore</a>
+          <a href="#stats">Stats</a>
+        </nav>
+        <div className={styles.actions}>
+          <button type="button" className={styles.soundBtn} aria-pressed={soundOn} onClick={toggleSound}>
+            {soundOn ? "SOUND ON" : "SOUND OFF"}
+          </button>
+          <button
+            type="button"
+            className={styles.networkPill}
+            onClick={handleNetworkClick}
+            style={wrongNetwork ? { color: "#f4d03f", borderColor: "#f4d03f" } : undefined}
+          >
+            {wrongNetwork ? "WRONG NETWORK · SWITCH" : networkLabel}
+          </button>
+          <button type="button" className={styles.walletBtn} onClick={handleWalletClick} disabled={connecting}>
+            {walletLabel}
+          </button>
+        </div>
+      </header>
+      {walletErrorMessage && (
+        <div className={styles.walletError} role="alert">
+          {walletErrorMessage}
+        </div>
+      )}
+    </>
   );
 }

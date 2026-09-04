@@ -4,11 +4,10 @@ import StatusPill from "../common/StatusPill";
 import CountdownDisplay from "./CountdownDisplay";
 import PressButton from "./PressButton";
 import PressStatusLine from "./PressStatusLine";
-import { useUserPress } from "../../hooks/useUserPress";
 import { useCountdown } from "../../hooks/useCountdown";
 import { buttonExperimentAbi } from "../../abi/buttonExperiment";
 import { runtimeConfig } from "../../config/runtimeConfig";
-import type { ExperimentState } from "../../domain/types";
+import type { ExperimentState, UserPressState } from "../../domain/types";
 import type { PressFeed } from "../../hooks/usePressFeed";
 import type { PreviewClockState } from "../../hooks/usePreviewClock";
 import styles from "./PressStage.module.css";
@@ -16,13 +15,14 @@ import styles from "./PressStage.module.css";
 export default function PressStage({
   state,
   feed,
-  preview
+  preview,
+  userPress
 }: {
   state: ExperimentState;
   feed: PressFeed;
   preview: PreviewClockState;
+  userPress: UserPressState;
 }) {
-  const userPress = useUserPress();
   const { address, isConnected, chainId, connector } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
@@ -100,15 +100,21 @@ export default function PressStage({
     : !state.loaded || !state.started || !state.alive || already || state.stale || pending;
 
   useEffect(() => {
-    if (!receipt.data) return;
-    if (receipt.data.status !== "success") {
-      setTxStatus("PRESS FAILED · Transaction reverted. The clock may have expired or your wallet had already pressed.");
+    if (receipt.data) {
+      if (receipt.data.status !== "success") {
+        setTxStatus("PRESS FAILED · Transaction reverted. The clock may have expired or your wallet had already pressed.");
+        setPending(false);
+        return;
+      }
+      setTxStatus("CONFIRMED ON ROBINHOOD CHAIN · YOUR PRESS IS PERMANENT");
       setPending(false);
       return;
     }
-    setTxStatus("CONFIRMED ON ROBINHOOD CHAIN · YOUR PRESS IS PERMANENT");
-    setPending(false);
-  }, [receipt.data]);
+    if (receipt.isError) {
+      setTxStatus(`PRESS STATUS UNKNOWN · ${receipt.error?.message || "Could not confirm the transaction. Check Blockscout."}`);
+      setPending(false);
+    }
+  }, [receipt.data, receipt.isError, receipt.error]);
 
   async function handlePress() {
     if (runtimeConfig.previewMode) {
@@ -152,6 +158,8 @@ export default function PressStage({
     }
   }
 
+  const effectiveTxStatus = txStatus || (runtimeConfig.previewMode ? "" : state.error || "");
+
   const identity = useMemo(
     () =>
       runtimeConfig.previewMode
@@ -165,7 +173,7 @@ export default function PressStage({
       <StatusPill label={statusLabel} tone={statusTone as "" | "live" | "dead" | "stale"} />
       <CountdownDisplay reading={reading} deadlineLabel={deadlineLabel} pulseKey={feed.latestKey} />
       <PressButton label={buttonLabel} disabled={buttonDisabled} onPress={handlePress} />
-      <PressStatusLine identity={identity} txStatus={txStatus} />
+      <PressStatusLine identity={identity} txStatus={effectiveTxStatus} />
     </section>
   );
 }

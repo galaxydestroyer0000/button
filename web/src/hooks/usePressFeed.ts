@@ -18,6 +18,11 @@ export function usePressFeed(state: ExperimentState): PressFeed {
   const [feed, setFeed] = useState<PressFeed>({ events: [], freshness: "SYNCING", latestKey: "" });
   const publicClient = usePublicClient({ chainId: runtimeConfig.network.chainId });
   const latestKeyRef = useRef("");
+  const currentBlockRef = useRef(state.currentBlock);
+
+  useEffect(() => {
+    currentBlockRef.current = state.currentBlock;
+  }, [state.currentBlock]);
 
   useEffect(() => {
     if (runtimeConfig.previewMode || !state.loaded || !publicClient) return;
@@ -26,7 +31,7 @@ export function usePressFeed(state: ExperimentState): PressFeed {
 
     async function refresh() {
       try {
-        const fromBlock = runtimeConfig.deployBlock ?? BigInt(Math.max(0, state.currentBlock - 20_000));
+        const fromBlock = runtimeConfig.deployBlock ?? BigInt(Math.max(0, currentBlockRef.current - 20_000));
         let logs;
         try {
           logs = await publicClient!.getLogs({
@@ -39,7 +44,7 @@ export function usePressFeed(state: ExperimentState): PressFeed {
           logs = await publicClient!.getLogs({
             address: contract,
             event: PRESSED_EVENT as unknown as AbiEvent,
-            fromBlock: BigInt(Math.max(0, state.currentBlock - 5_000)),
+            fromBlock: BigInt(Math.max(0, currentBlockRef.current - 5_000)),
             toBlock: "latest"
           });
         }
@@ -81,7 +86,7 @@ export function usePressFeed(state: ExperimentState): PressFeed {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [publicClient, state.loaded, state.currentBlock]);
+  }, [publicClient, state.loaded]);
 
   return feed;
 }

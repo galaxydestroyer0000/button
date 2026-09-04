@@ -31,7 +31,11 @@ export default function StatsPanel({
   return (
     <section id="stats" aria-label="Experiment stats">
       <div className={styles.grid}>
-        <StatTile label="TOTAL PRESSES" value={total ? total.toLocaleString() : "—"} caption="one wallet = one press" />
+        <StatTile
+          label="TOTAL PRESSES"
+          value={runtimeConfig.previewMode ? total.toLocaleString() : state.loaded ? total.toLocaleString() : "—"}
+          caption="one wallet = one press"
+        />
         <StatTile label="EXPERIMENT UPTIME" value={Number.isFinite(ageSeconds) ? formatDuration(ageSeconds) : "—"} caption="since activation" />
         <StatTile label="CLOSEST CALL" value={total ? `${closest}s` : "—"} caption="lowest clock at press" />
         <StatTile label="CURRENT STREAK" value={streak ? String(streak) : "—"} caption="consecutive same-faction presses" />

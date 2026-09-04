@@ -47,7 +47,7 @@ export function usePreviewClock(): PreviewClockState {
         {
           key: `preview-${Date.now()}`,
           txHash: "",
-          presser: "0x0000000000000000000000000000000000PVEW" as `0x${string}`,
+          presser: "0x000000000000000000000000000000000000dEaD" as `0x${string}`,
           remaining: left,
           faction: nextFaction,
           timestamp: Math.floor(Date.now() / 1000),
