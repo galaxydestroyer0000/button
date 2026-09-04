@@ -31,7 +31,6 @@ export function useUserPress(): UserPressState {
       } catch (error) {
         if (cancelled) return;
         console.warn("User-state read failed", error);
-        setState((prev) => ({ ...prev, loaded: prev.loaded }));
       }
     }
 
