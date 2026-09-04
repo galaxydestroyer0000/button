@@ -1,5 +1,5 @@
 import { runtimeConfig } from "../../config/runtimeConfig";
-import type { PressFeed } from "../../hooks/usePressFeed";
+import type { PressFeed } from "../../domain/types";
 import type { PreviewClockState } from "../../hooks/usePreviewClock";
 import FeedRow from "./FeedRow";
 import FeedSkeleton from "./FeedSkeleton";

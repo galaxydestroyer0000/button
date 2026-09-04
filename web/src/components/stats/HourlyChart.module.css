@@ -1,0 +1,30 @@
+.wrap { border: 1px solid #282828; background: #0e0e0e; padding: 24px; position: relative; }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.subtitle { color: #6f6c65; font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+.svg { width: 100%; height: 160px; display: block; overflow: visible; }
+.baseline { stroke: #2a2a2a; stroke-width: 1; }
+.bar { fill: var(--red); opacity: .78; transition: opacity .12s ease; }
+.barHover { fill: var(--red); opacity: 1; }
+.barGroup { cursor: pointer; }
+.axisLabel { fill: #6f6c65; font: 700 8px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .05em; }
+
+.empty { min-height: 160px; display: flex; align-items: center; justify-content: center; color: #6f6c65; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; text-align: center; }
+
+.tooltip {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  background: #171717;
+  border: 1px solid #3a3a3a;
+  color: #dedbd4;
+  padding: 6px 10px;
+  font: 700 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .05em;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar, .barHover { transition: none; }
+}

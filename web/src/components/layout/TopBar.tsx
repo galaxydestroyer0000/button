@@ -1,16 +1,24 @@
 import { useAccount, useConnect, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
+import { NavLink } from "react-router-dom";
 import { shortAddress } from "../../domain/format";
 import { runtimeConfig } from "../../config/runtimeConfig";
 import { isSoundEnabled, playTone, setSoundEnabled } from "../../audio/tick";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./TopBar.module.css";
 
 export default function TopBar() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, isPending: connecting, error: connectError } = useConnect();
+  const { connect, isPending: connecting, error: connectError } = useConnect();
   const { switchChain, error: switchError } = useSwitchChain();
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  // wagmi's WagmiProvider auto-attempts a silent reconnect on mount using the same
+  // connect mutation this hook reads — a stale "previously connected" record with no
+  // wallet actually available (a fresh mobile Safari tab, a wallet extension that got
+  // uninstalled, etc.) surfaces through `connectError` exactly like a real failed
+  // click would, even though the visitor never touched the button. Only a click
+  // routed through handleWalletClick should ever produce the visible error banner.
+  const userInitiatedConnectRef = useRef(false);
 
   const walletLabel = runtimeConfig.previewMode
     ? "PREVIEW MODE"
@@ -32,6 +40,7 @@ export default function TopBar() {
 
   function handleWalletClick() {
     if (runtimeConfig.previewMode || isConnected) return;
+    userInitiatedConnectRef.current = true;
     connect({ connector: injected() });
   }
 
@@ -42,33 +51,70 @@ export default function TopBar() {
 
   const rejected =
     connectError &&
+    userInitiatedConnectRef.current &&
     ((connectError as unknown as { cause?: { code?: number } })?.cause?.code === 4001 ||
       (connectError as unknown as { code?: number })?.code === 4001 ||
       connectError.name === "UserRejectedRequestError");
 
-  const connectionMessage = rejected
-    ? "CONNECTION REJECTED · NOTHING CHANGED"
-    : connectError && connectors.length === 0
-      ? "NO INJECTED EVM WALLET · OPEN IN ROBINHOOD WALLET OR METAMASK BROWSER"
-      : connectError
-        ? `WALLET ERROR · ${connectError.message}`
-        : "";
+  // wagmi's injected() connector is always registered in wagmiConfig regardless of
+  // whether window.ethereum actually exists at runtime — `connectors.length` is a
+  // static build-time count, never 0 in this app, so it can never distinguish "no
+  // wallet extension available" from any other failure. The connector throws a
+  // specifically-named ProviderNotFoundError in that case; match on that instead.
+  const noProvider = (connectError as unknown as { name?: string } | undefined)?.name === "ProviderNotFoundError";
 
-  const switchMessage = switchError ? `NETWORK SWITCH FAILED · ${switchError.message}` : "";
+  const connectionMessage = !userInitiatedConnectRef.current
+    ? ""
+    : rejected
+      ? "CONNECTION REJECTED · NOTHING CHANGED"
+      : noProvider
+        ? "NO INJECTED EVM WALLET · OPEN IN ROBINHOOD WALLET OR METAMASK BROWSER"
+        : connectError
+          ? `WALLET ERROR · ${connectError.message}`
+          : "";
+
+  // A wallet that doesn't already have this chain registered falls back to
+  // `wallet_addEthereumChain`, and most wallets (MetaMask included) flat-out refuse
+  // to auto-add a chain whose RPC URL isn't HTTPS — real for Robinhood Chain
+  // testnet/mainnet (always HTTPS) but always true for a local RPC like
+  // http://127.0.0.1:8545. The wallet reports this as a generic "user rejected"
+  // error with the real reason folded into the message text, so it must be
+  // detected there rather than trusted at face value — otherwise a wallet-level
+  // validation failure the user never even saw a prompt for gets mislabeled as
+  // something they personally cancelled.
+  const httpsRpcRejected = Boolean(switchError && /https/i.test(switchError.message));
+
+  const switchRejected =
+    !httpsRpcRejected &&
+    switchError &&
+    ((switchError as unknown as { cause?: { code?: number } })?.cause?.code === 4001 ||
+      (switchError as unknown as { code?: number })?.code === 4001 ||
+      switchError.name === "UserRejectedRequestError");
+
+  const switchMessage = httpsRpcRejected
+    ? `YOUR WALLET CAN'T AUTO-ADD ${runtimeConfig.network.name.toUpperCase()} (ITS RPC ISN'T HTTPS) · ADD CHAIN ${runtimeConfig.network.chainId} AT ${runtimeConfig.rpcUrl} MANUALLY IN YOUR WALLET, THEN SWITCH TO IT THERE`
+    : switchRejected
+      ? "NETWORK SWITCH CANCELLED · NOTHING CHANGED"
+      : switchError
+        ? `NETWORK SWITCH FAILED · ${switchError.message}`
+        : "";
 
   const walletErrorMessage = connectionMessage || switchMessage;
 
   return (
     <>
       <header className={styles.topbar}>
-        <a className={styles.brand} href="./">
+        <NavLink className={styles.brand} to="/">
           <span className={styles.brandDot} />
           BUTTON <span>/ RDDT</span>
-        </a>
+        </NavLink>
         <nav className={styles.nav}>
-          <a href="#experiment">Experiment</a>
-          <a href="#lore">Lore</a>
-          <a href="#stats">Stats</a>
+          <NavLink to="/" end>
+            Experiment
+          </NavLink>
+          <NavLink to="/history">History</NavLink>
+          <NavLink to="/stats">Stats</NavLink>
+          <NavLink to="/proof">Proof</NavLink>
         </nav>
         <div className={styles.actions}>
           <button type="button" className={styles.soundBtn} aria-pressed={soundOn} onClick={toggleSound}>

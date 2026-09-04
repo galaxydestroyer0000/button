@@ -4,6 +4,12 @@ import { buttonExperimentAbi } from "../abi/buttonExperiment";
 import { runtimeConfig } from "../config/runtimeConfig";
 import type { ExperimentState } from "../domain/types";
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+function normalizeAddress(value: unknown): `0x${string}` | "" {
+  const address = String(value ?? "");
+  return address.toLowerCase() === ZERO_ADDRESS ? "" : (address as `0x${string}`);
+}
+
 const INITIAL_STATE: ExperimentState = {
   loaded: false,
   stale: false,
@@ -13,6 +19,8 @@ const INITIAL_STATE: ExperimentState = {
   deadline: 0,
   totalPresses: 0,
   closestCall: 0,
+  closestCallWallet: "",
+  lastPresser: "",
   factionCounts: [0, 0, 0, 0, 0, 0, 0],
   currentBlock: 0,
   chainOffsetMs: 0,
@@ -33,13 +41,15 @@ export function useExperimentState(): ExperimentState {
         const code = await publicClient!.getCode({ address: contract });
         if (!code || code === "0x") throw new Error("No contract code at configured address");
 
-        const [block, started, startedAt, deadline, totalPresses, closestCall, alive, ...counts] = await Promise.all([
+        const [block, started, startedAt, deadline, totalPresses, closestCall, closestCallWallet, lastPresser, alive, ...counts] = await Promise.all([
           publicClient!.getBlock({ blockTag: "latest" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "started" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "startedAt" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "deadline" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "totalPresses" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "closestCall" }),
+          publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "closestCallWallet" }),
+          publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "lastPresser" }),
           publicClient!.readContract({ address: contract, abi: buttonExperimentAbi, functionName: "isAlive" }),
           ...[1, 2, 3, 4, 5, 6].map((i) =>
             publicClient!.readContract({
@@ -62,6 +72,8 @@ export function useExperimentState(): ExperimentState {
           deadline: Number(deadline),
           totalPresses: Number(totalPresses),
           closestCall: Number(closestCall),
+          closestCallWallet: normalizeAddress(closestCallWallet),
+          lastPresser: normalizeAddress(lastPresser),
           factionCounts: [0, ...counts.map((c) => Number(c))] as ExperimentState["factionCounts"],
           currentBlock: Number(block.number),
           chainOffsetMs,

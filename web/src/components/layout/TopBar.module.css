@@ -25,7 +25,7 @@
   cursor: pointer;
 }
 .networkPill { color: #aaa69e; }
-.soundBtn { color: #77736d; padding: 0 11px; font-size: 9px; }
+.soundBtn { color: #aaa69e; padding: 0 11px; font-size: 9px; }
 .soundBtn[aria-pressed="true"] { color: #f2efe8; border-color: #4a4a4a; }
 .walletBtn { background: var(--ink); color: #090909; border-color: var(--ink); }
 .walletBtn:hover { background: white; }

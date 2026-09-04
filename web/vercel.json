@@ -2,6 +2,19 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/press/:number",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(bot|facebookexternalhit|Twitterbot|Discordbot|Slackbot|TelegramBot|WhatsApp|LinkedInBot|Applebot|Pinterest|redditbot).*" }],
+      "destination": "/api/og?type=press&number=:number"
+    },
+    {
+      "source": "/wallet/:address",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(bot|facebookexternalhit|Twitterbot|Discordbot|Slackbot|TelegramBot|WhatsApp|LinkedInBot|Applebot|Pinterest|redditbot).*" }],
+      "destination": "/api/og?type=wallet&address=:address"
+    },
+    { "source": "/((?!assets/|about/|config\\.js|api/).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -1,0 +1,77 @@
+.section { border: 1px solid var(--line); padding: 58px 48px; }
+.head { margin-bottom: 26px; }
+.head h2 { margin: 6px 0 0; font-size: clamp(26px,3.6vw,48px); letter-spacing: -.05em; line-height: .98; }
+.eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.lede { margin-top: 14px; max-width: 680px; color: #aaa69e; font-size: 14px; line-height: 1.6; }
+
+.notice { border: 1px dashed #3a3a3a; padding: 60px 20px; text-align: center; color: #6f6c65; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; }
+
+.facts { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid #282828; margin-bottom: 32px; }
+.facts > div { min-height: 88px; padding: 16px 18px; border-right: 1px solid #282828; border-bottom: 1px solid #282828; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; }
+.facts > div:nth-child(3n) { border-right: 0; }
+.facts > div:nth-last-child(-n+3) { border-bottom: 0; }
+.facts span { color: #77746e; font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
+.facts code { color: #dedbd4; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.actionCard { border: 1px solid #2a2a2a; background: #0e0e0e; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.actionCard h3 { margin: 0; font-size: 15px; letter-spacing: -.01em; }
+.actionCard p { margin: 0; color: #8c8982; font-size: 12.5px; line-height: 1.55; }
+.actionCard button {
+  margin-top: auto;
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 12px;
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.actionCard button:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+.actionCard button:disabled { opacity: .35; cursor: not-allowed; }
+
+.txStatus { margin-top: 20px; padding: 14px 16px; border: 1px solid #262626; background: #0c0c0c; color: #dbd8d0; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.txStatus a { color: #8c8982; border-bottom: 1px solid #444; }
+.txStatus a:hover { color: #ddd; border-color: #ddd; }
+
+.scheduleCard { margin-top: 32px; border: 1px solid #2a2a2a; background: #0e0e0e; padding: 22px; }
+.scheduleCard h3 { margin: 0 0 10px; font-size: 15px; }
+.scheduleCard p { margin: 0; color: #8c8982; font-size: 12.5px; line-height: 1.6; }
+.scheduleCard p strong { color: #d8a; }
+.disabledNotice { margin-top: 12px; color: #6f6c65; font-size: 12px; font-style: italic; }
+
+.scheduleForm { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+.scheduleForm input {
+  background: #0c0c0c;
+  border: 1px solid #333;
+  color: #ddd;
+  padding: 10px 12px;
+  font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.scheduleForm button, .armed button {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 10px 16px;
+  font: 800 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.scheduleForm button:disabled { opacity: .35; cursor: not-allowed; }
+.scheduleForm button:hover:not(:disabled), .armed button:hover { border-color: var(--red); color: var(--red); }
+
+.armed { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.armed div { color: #dbd8d0; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; }
+.countdown { font-size: 20px !important; font-weight: 800; color: #f2efe8 !important; letter-spacing: .04em !important; }
+
+@media (max-width: 900px) {
+  .facts { grid-template-columns: 1fr 1fr; }
+  .facts > div:nth-child(3n) { border-right: 1px solid #282828; }
+  .facts > div:nth-child(2n) { border-right: 0; }
+  .actions { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .section { padding: 34px 18px; }
+  .facts { grid-template-columns: 1fr; }
+  .facts > div { border-right: 0 !important; }
+}

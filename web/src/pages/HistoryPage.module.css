@@ -1,0 +1,48 @@
+.section { border: 1px solid var(--line); padding: 58px 48px; }
+.head { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 30px; }
+.head h2 { margin: 6px 0 0; font-size: clamp(28px,4vw,54px); letter-spacing: -.05em; line-height: .95; }
+.eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+.freshness { color: #77746e; font-size: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 18px; align-items: end; padding: 20px; margin-bottom: 24px; border: 1px solid #282828; background: #0e0e0e; }
+.filters label { display: flex; flex-direction: column; gap: 6px; font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; color: #77746e; }
+.filters select, .filters input {
+  background: #111;
+  border: 1px solid #3a3a3a;
+  color: #dedbd4;
+  padding: 8px 10px;
+  font: 700 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  min-width: 140px;
+}
+.clear {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 9px 12px;
+  font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.tape { border-top: 1px solid #343434; min-height: 120px; }
+
+.pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 16px; flex-wrap: wrap; }
+.pagination span { color: #8a8780; font: 700 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
+.pagination button {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 9px 14px;
+  font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.pagination button:disabled { opacity: .35; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .section { padding: 32px 16px; }
+  .head { align-items: start; flex-direction: column; gap: 12px; }
+  .filters { padding: 14px; gap: 12px; }
+  .filters select, .filters input { min-width: 0; width: 100%; }
+}

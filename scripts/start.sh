@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 MODE="${1:-testnet}"
-cd "$(dirname "$0")/../contracts"
 
-if [[ -z "${PRIVATE_KEY:-}" || -z "${BUTTON_CONTRACT:-}" ]]; then
-  echo "PRIVATE_KEY and BUTTON_CONTRACT are required" >&2
-  exit 1
-fi
+node "$(dirname "$0")/validate-env.mjs" start
+
+cd "$(dirname "$0")/../contracts"
 
 if [[ "$MODE" == "mainnet" ]]; then
   if [[ "${I_UNDERSTAND_MAINNET:-}" != "YES" ]]; then

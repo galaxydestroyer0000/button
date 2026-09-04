@@ -1,6 +1,6 @@
-import { FACTIONS } from "../../domain/factions";
 import { txUrl } from "../../config/network";
 import { runtimeConfig } from "../../config/runtimeConfig";
+import IdentityCard from "../identity/IdentityCard";
 import styles from "./PressStatusLine.module.css";
 
 export interface IdentityInfo {
@@ -9,28 +9,20 @@ export interface IdentityInfo {
   hasPressed: boolean;
   faction: number;
   remaining: number;
+  pressNumber: number;
   txHash: string;
+  presser: string;
+  isNewClosestCall?: boolean;
 }
 
 export default function PressStatusLine({ identity, txStatus }: { identity: IdentityInfo; txStatus: string }) {
   let identityLine = "YOU ARE GREY · YOU HAVE NOT PRESSED";
-  let identityColor = FACTIONS[0].color;
 
   if (!runtimeConfig.previewMode && !identity.connected) {
     identityLine = "CONNECT A WALLET TO REVEAL YOUR STATUS";
-    identityColor = "";
   } else if (!runtimeConfig.previewMode && identity.connected && !identity.loaded) {
     identityLine = "READING YOUR ONCHAIN STATUS…";
-    identityColor = "";
-  } else if (identity.hasPressed) {
-    const f = FACTIONS[identity.faction];
-    identityLine = `YOU ARE ${f.name} · YOUR ONE PRESS IS SPENT`;
-    identityColor = f.color;
   }
-
-  const share = identity.hasPressed
-    ? `I pressed BUTTON at ${identity.remaining} seconds. ${FACTIONS[identity.faction].name}. One press forever. $BUTTON / RDDT`
-    : "";
 
   return (
     <>
@@ -42,30 +34,31 @@ export default function PressStatusLine({ identity, txStatus }: { identity: Iden
       <div className={styles.rule}>
         ONE WALLET. ONE PRESS. <strong>FOREVER.</strong>
       </div>
-      <div className={styles.identity} style={identityColor ? { color: identityColor } : undefined}>
-        {identityLine}
-      </div>
+      {/* Once pressed, the card below says everything this line would have said —
+          showing both is pure redundancy, so it steps aside instead of stacking. */}
+      {!identity.hasPressed && <div className={styles.identity}>{identityLine}</div>}
       <div className={styles.txStatus} aria-live="polite">{txStatus}</div>
       {identity.hasPressed && (
-        <div className={styles.postPress}>
-          <strong style={{ color: FACTIONS[identity.faction].color }}>
-            YOU PRESSED AT {String(identity.remaining).padStart(2, "0")}s — {FACTIONS[identity.faction].name}
-          </strong>
+        // CSS-only entrance animation: this block only ever mounts once, exactly when
+        // hasPressed first flips true, so DOM insertion itself is the reveal trigger
+        // — no extra "just confirmed" state needed, and it works identically for a
+        // real confirmed transaction and a local preview press.
+        <div className={`${styles.postPress} ${styles.reveal}`}>
+          <IdentityCard
+            shareable
+            data={{
+              pressNumber: identity.pressNumber,
+              remaining: identity.remaining,
+              faction: identity.faction,
+              presser: identity.presser,
+              isNewClosestCall: identity.isNewClosestCall
+            }}
+          />
           {identity.txHash && (
-            <a href={txUrl(runtimeConfig.network.explorer, identity.txHash)} target="_blank" rel="noopener noreferrer">
-              TX ↗
+            <a className={styles.txLink} href={txUrl(runtimeConfig.network.explorer, identity.txHash)} target="_blank" rel="noopener noreferrer">
+              VIEW TRANSACTION ↗
             </a>
           )}
-          <button type="button" onClick={() => navigator.clipboard?.writeText(share).catch(() => {})}>
-            COPY
-          </button>
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(share)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            SHARE ON X ↗
-          </a>
         </div>
       )}
     </>

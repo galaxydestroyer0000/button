@@ -1,0 +1,10 @@
+.list { border: 1px solid #282828; }
+.empty {
+  border: 1px dashed #3a3a3a;
+  padding: 30px 20px;
+  text-align: center;
+  color: #6f6c65;
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}

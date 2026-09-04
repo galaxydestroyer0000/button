@@ -24,7 +24,7 @@ export default function TokenPanel() {
         )}
       </div>
       <div className={styles.art}>
-        <img src="/assets/button-token.png" alt="BUTTON token artwork: a red button and countdown" />
+        <img src="/assets/button-token.webp" alt="BUTTON token artwork: a red button and countdown" width="1254" height="1254" loading="lazy" />
       </div>
     </section>
   );

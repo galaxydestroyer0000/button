@@ -1,34 +1,108 @@
+import { lazy, Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
 import AppShell from "./components/layout/AppShell";
 import SystemStrip from "./components/layout/SystemStrip";
-import PressStage from "./components/press/PressStage";
-import LivePressFeed from "./components/feed/LivePressFeed";
-import StatsPanel from "./components/stats/StatsPanel";
-import TokenPanel from "./components/token/TokenPanel";
-import IdentityPanel from "./components/identity/IdentityPanel";
-import RulesSection from "./components/rules/RulesSection";
-import ProofSection from "./components/rules/ProofSection";
+import GlobalPulse from "./components/common/GlobalPulse";
+import HomePage from "./pages/HomePage";
 import { useExperimentState } from "./hooks/useExperimentState";
-import { usePressFeed } from "./hooks/usePressFeed";
+import { useEventSync } from "./hooks/useEventSync";
 import { usePreviewClock } from "./hooks/usePreviewClock";
 import { useUserPress } from "./hooks/useUserPress";
-import { runtimeConfig } from "./config/runtimeConfig";
+
+// The homepage is the entry point for nearly every visitor and stays in the main
+// bundle; these secondary pages are split into their own chunks so a first-time
+// visitor's initial load doesn't pay for /history, /stats, /press, /wallet code
+// they may never navigate to.
+const HistoryPage = lazy(() => import("./pages/HistoryPage"));
+const StatsPage = lazy(() => import("./pages/StatsPage"));
+const PressPage = lazy(() => import("./pages/PressPage"));
+const WalletPage = lazy(() => import("./pages/WalletPage"));
+const ProofPage = lazy(() => import("./pages/ProofPage"));
+// Deliberately unlinked from nav (see the "Admin page location" decision) — the
+// contract itself is the real access control, this route is just not advertised.
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+
+function RouteLoading() {
+  return (
+    <div
+      role="status"
+      style={{
+        padding: "80px 24px",
+        textAlign: "center",
+        color: "#77746e",
+        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+        fontSize: "11px",
+        letterSpacing: ".12em",
+        textTransform: "uppercase"
+      }}
+    >
+      LOADING…
+    </div>
+  );
+}
 
 export default function App() {
   const state = useExperimentState();
-  const feed = usePressFeed(state);
+  // One sync instance for the whole app session — it must not restart on every route
+  // change, so it's owned here, above the router, and its status/data flow down.
+  const sync = useEventSync(state);
   const preview = usePreviewClock();
   const userPress = useUserPress();
-  const events = runtimeConfig.previewMode ? preview.events : feed.events;
 
   return (
     <AppShell footer={<SystemStrip state={state} />}>
-      <PressStage state={state} feed={feed} preview={preview} userPress={userPress} />
-      <LivePressFeed feed={feed} preview={runtimeConfig.previewMode ? preview : null} />
-      <StatsPanel state={state} events={events} preview={runtimeConfig.previewMode ? preview : null} />
-      <IdentityPanel preview={preview} userPress={userPress} />
-      <TokenPanel />
-      <RulesSection />
-      <ProofSection state={state} />
+      <GlobalPulse pulseEvent={sync.pulseEvent} />
+      <Routes>
+        <Route path="/" element={<HomePage state={state} sync={sync} preview={preview} userPress={userPress} />} />
+        <Route
+          path="/history"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <HistoryPage sync={sync} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <StatsPage state={state} sync={sync} preview={preview} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/press/:number"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <PressPage state={state} sync={sync} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/wallet/:address"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <WalletPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/proof"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <ProofPage state={state} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Suspense fallback={<RouteLoading />}>
+              <AdminPage state={state} />
+            </Suspense>
+          }
+        />
+      </Routes>
     </AppShell>
   );
 }

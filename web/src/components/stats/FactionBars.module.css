@@ -7,6 +7,15 @@
 .bar > i { display: block; height: 100%; width: var(--pct); background: var(--fc); }
 .count { text-align: right; }
 
+.highlight { animation: factionHighlight 1.4s ease-out; }
+@keyframes factionHighlight {
+  0% { background: color-mix(in srgb, var(--fc) 35%, #101010); }
+  100% { background: #101010; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .highlight { animation: none; }
+}
+
 @media (max-width: 640px) {
   .row { grid-template-columns: 12px 92px 70px 1fr; padding: 0 10px; gap: 8px; }
   .count { display: none; }

@@ -1,7 +1,9 @@
 import { defineChain } from "viem";
 
+export type NetworkKey = "mainnet" | "testnet" | "local";
+
 export interface NetworkConfig {
-  key: "mainnet" | "testnet";
+  key: NetworkKey;
   name: string;
   short: string;
   chainId: number;
@@ -26,7 +28,18 @@ const testnetChain = defineChain({
   blockExplorers: { default: { name: "Blockscout", url: "https://explorer.testnet.chain.robinhood.com" } }
 });
 
-export const NETWORKS: Record<"mainnet" | "testnet", NetworkConfig> = {
+// Anvil's fixed chain ID and default RPC port. Only ever used by `scripts/demo.sh`
+// against a real local `anvil` node with a real deployed contract — never a stand-in
+// for testnet/mainnet, and never reachable unless VITE_RH_NETWORK=local is set.
+const localChain = defineChain({
+  id: 31337,
+  name: "Local Anvil",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: { default: { http: ["http://127.0.0.1:8545"] } },
+  blockExplorers: { default: { name: "None", url: "" } }
+});
+
+export const NETWORKS: Record<NetworkKey, NetworkConfig> = {
   mainnet: {
     key: "mainnet",
     name: "Robinhood Chain",
@@ -44,13 +57,25 @@ export const NETWORKS: Record<"mainnet" | "testnet", NetworkConfig> = {
     rpc: "https://rpc.testnet.chain.robinhood.com",
     explorer: "https://explorer.testnet.chain.robinhood.com",
     chain: testnetChain
+  },
+  local: {
+    key: "local",
+    name: "Local Anvil",
+    short: "LOCAL",
+    chainId: 31337,
+    rpc: "http://127.0.0.1:8545",
+    explorer: "",
+    chain: localChain
   }
 };
 
+// The local network has no block explorer — returning "#" instead of concatenating
+// an empty base (which would silently point at this app's own origin, e.g. "/tx/0x…")
+// keeps every explorer-link call site safe without touching each one individually.
 export function txUrl(explorer: string, hash: string): string {
-  return `${explorer}/tx/${hash}`;
+  return explorer ? `${explorer}/tx/${hash}` : "#";
 }
 
 export function addressUrl(explorer: string, addr: string): string {
-  return `${explorer}/address/${addr}`;
+  return explorer ? `${explorer}/address/${addr}` : "#";
 }

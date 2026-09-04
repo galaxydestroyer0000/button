@@ -17,6 +17,8 @@ export default function ProofSection({ state }: { state: ExperimentState }) {
         <div><span>DEPLOY BLOCK</span><code>{runtimeConfig.raw.contractDeployBlock || "—"}</code></div>
         <div><span>CURRENT BLOCK</span><code>{runtimeConfig.previewMode ? "—" : state.currentBlock || "—"}</code></div>
         <div><span>RPC</span><code>{runtimeConfig.previewMode ? "PREVIEW ONLY" : state.stale ? "STALE" : state.loaded ? "CONNECTED" : "CHECKING"}</code></div>
+        <div><span>$BUTTON TOKEN</span><code>{runtimeConfig.tokenAddress || "NOT CONFIGURED"}</code></div>
+        <div><span>RPC OVERRIDE</span><code>{runtimeConfig.previewMode ? "—" : runtimeConfig.raw.rpcUrl ? "CONFIGURED" : "PUBLIC DEFAULT"}</code></div>
       </div>
       {!runtimeConfig.previewMode && (
         <a className={styles.link} href={addressUrl(runtimeConfig.network.explorer, runtimeConfig.contractAddress)} target="_blank" rel="noopener noreferrer">

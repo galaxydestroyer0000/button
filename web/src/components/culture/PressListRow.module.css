@@ -1,0 +1,25 @@
+.row {
+  display: grid;
+  grid-template-columns: 70px 60px 90px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 50px;
+  padding: 0 18px;
+  background: #101010;
+  border-bottom: 1px solid #202020;
+  font: 650 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: inherit;
+  transition: background .12s ease;
+}
+.row:hover { background: #161616; }
+.row:last-child { border-bottom: 0; }
+.pressNumber { color: #65625d; }
+.seconds { color: #f2efe8; font-size: 13px; }
+.faction { color: var(--fc); font-weight: 800; letter-spacing: .06em; }
+.wallet { color: #a8a49a; }
+.badge { color: var(--fc); font: 800 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: 50px 44px 70px 1fr; gap: 8px; padding: 0 10px; }
+  .badge { display: none; }
+}

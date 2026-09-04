@@ -9,5 +9,11 @@ web/node_modules/
 contracts/cache/
 contracts/out/
 contracts/lib/
+contracts/broadcast/
+
+web/test-results/
+web/playwright-report/
+web/blob-report/
+*.tsbuildinfo
 
 .worktrees/

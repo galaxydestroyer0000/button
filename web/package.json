@@ -8,25 +8,35 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "typecheck:api": "tsc --noEmit -p tsconfig.api.json",
+    "typecheck:e2e": "tsc --noEmit -p tsconfig.e2e.json",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "react-router-dom": "^7.18.3",
     "viem": "^2.21.0",
     "wagmi": "^2.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^20.19.43",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "@vercel/node": "^12.0.0",
     "@vitejs/plugin-react": "^4.3.0",
     "eslint": "^9.11.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.0",
+    "fake-indexeddb": "^6.2.5",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.7.0",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "vitest": "^2.1.9"
   }
 }

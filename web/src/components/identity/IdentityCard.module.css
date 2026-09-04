@@ -1,0 +1,45 @@
+.card {
+  border: 1px solid #2a2a2a;
+  border-top: 3px solid var(--fc);
+  background: #0e0e0e;
+  padding: 22px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pressNumber { color: #77746e; font: 800 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
+.record { color: var(--fc); font: 800 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
+
+.readout { margin-top: 10px; display: flex; align-items: baseline; gap: 8px; }
+.seconds {
+  font: 900 56px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: -.03em;
+  color: #f7f4ed;
+  font-variant-numeric: tabular-nums;
+}
+.unit { font: 800 13px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; color: #77746e; }
+
+.faction { margin-top: 2px; font: 800 14px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; color: var(--fc); }
+.wallet { margin-top: 4px; color: #77746e; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.quote { margin-top: 14px; padding-top: 14px; border-top: 1px solid #232323; font-size: 13px; font-style: italic; color: #a8a49a; line-height: 1.4; }
+
+.actions { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.actions button, .actions a {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 8px 12px;
+  font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.actions button:hover, .actions a:hover { border-color: var(--fc); color: var(--fc); }
+
+@media (max-width: 640px) {
+  .card { padding: 18px 18px 16px; max-width: 100%; }
+  .seconds { font-size: 46px; }
+}

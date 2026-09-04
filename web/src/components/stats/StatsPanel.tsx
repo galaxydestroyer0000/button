@@ -10,11 +10,13 @@ import styles from "./StatsPanel.module.css";
 export default function StatsPanel({
   state,
   events,
-  preview
+  preview,
+  pulseEvent
 }: {
   state: ExperimentState;
   events: PressEvent[];
   preview: PreviewClockState | null;
+  pulseEvent?: PressEvent | null;
 }) {
   const total = runtimeConfig.previewMode ? preview!.total : state.totalPresses;
   const closest = runtimeConfig.previewMode ? preview!.closest : state.closestCall;
@@ -43,7 +45,7 @@ export default function StatsPanel({
       <div className={styles.latest}>
         <StatTile label="LATEST PRESSER" value={latestPresser ? shortAddress(latestPresser) : "—"} caption="most recent wallet" />
       </div>
-      <FactionBars counts={counts} total={total} />
+      <FactionBars counts={counts} total={total} pulseEvent={pulseEvent} />
     </section>
   );
 }

@@ -6,6 +6,26 @@
   <meta name="theme-color" content="#080808" />
   <meta name="description" content="BUTTON — one wallet, one press, one shared clock on Robinhood Chain." />
   <title>BUTTON / RDDT — One press forever</title>
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="BUTTON / RDDT" />
+  <meta property="og:title" content="BUTTON — one wallet, one press, forever" />
+  <meta property="og:description" content="A shared 60-second clock on Robinhood Chain. One wallet gets one press, ever. At zero, it ends forever." />
+  <meta property="og:image" content="/assets/button-token.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BUTTON — one wallet, one press, forever" />
+  <meta name="twitter:description" content="A shared 60-second clock on Robinhood Chain. One wallet gets one press, ever. At zero, it ends forever." />
+  <meta name="twitter:image" content="/assets/button-token.webp" />
+
+  <!--
+    This is a client-side SPA — a crawler that doesn't execute JS (Twitter, Discord,
+    iMessage) only ever sees these static, generic tags, on every route. /press/[n]
+    and /wallet/[address] get real per-page tags two ways: a small amount of
+    JS-side updating for crawlers that DO execute scripts (see src/lib/pageMeta.ts),
+    and a Vercel Edge Function (web/api/og.ts) that serves crawler user-agents a
+    server-rendered shell with the real press/wallet data baked in — see that file
+    and README's "Event history architecture" section for why.
+  -->
   <script src="/config.js"></script>
 </head>
 <body>

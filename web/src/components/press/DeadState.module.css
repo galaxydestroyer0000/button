@@ -1,0 +1,60 @@
+.dead {
+  min-height: 820px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 70px 16px;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background:
+    repeating-linear-gradient(135deg, rgba(239,43,36,.03) 0 2px, transparent 2px 14px),
+    var(--bg);
+  filter: grayscale(0.55);
+}
+
+.timer {
+  font: 800 clamp(70px, 11vw, 158px)/.88 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: -.085em;
+  font-variant-numeric: tabular-nums;
+  color: #6f6c67;
+}
+
+.headline {
+  margin-top: 18px;
+  font: 900 clamp(22px, 3vw, 34px) ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: .06em;
+  color: var(--red);
+}
+.subhead { margin-top: 10px; color: #6f6c65; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .08em; }
+
+.facts {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #222;
+  border: 1px solid #2a2a2a;
+  width: 100%;
+  max-width: 760px;
+}
+.facts > div { background: #0c0c0c; padding: 20px 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.facts span { color: #6f6c65; font: 700 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; }
+.facts strong { color: #dedbd4; font: 800 15px ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.factionBlock { margin-top: 48px; width: 100%; max-width: 760px; text-align: left; }
+.eyebrow { display: block; margin-bottom: 14px; color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
+
+.historyLink {
+  margin-top: 40px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  color: #ddd;
+}
+.historyLink:hover { color: var(--red); border-color: var(--red); }
+
+@media (max-width: 640px) {
+  .facts { grid-template-columns: 1fr 1fr; }
+}

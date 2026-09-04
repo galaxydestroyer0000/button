@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FACTIONS } from "../../domain/factions";
 import { relativeTime, shortAddress } from "../../domain/format";
 import { txUrl } from "../../config/network";
@@ -17,8 +18,20 @@ export default function FeedRow({ event, isNew }: { event: PressEvent; isNew: bo
 
   return (
     <div className={`${styles.row} ${isNew ? styles.flash : ""}`}>
-      <span className={styles.no}>#{event.pressNumber}</span>
-      <span className={styles.wallet}>{shortAddress(event.presser)}</span>
+      {runtimeConfig.previewMode ? (
+        <span className={styles.no}>#{event.pressNumber}</span>
+      ) : (
+        <Link className={styles.no} to={`/press/${event.pressNumber}`}>
+          #{event.pressNumber}
+        </Link>
+      )}
+      {runtimeConfig.previewMode ? (
+        <span className={styles.wallet}>{shortAddress(event.presser)}</span>
+      ) : (
+        <Link className={styles.wallet} to={`/wallet/${event.presser}`}>
+          {shortAddress(event.presser)}
+        </Link>
+      )}
       <span className={styles.seconds}>{event.remaining}s</span>
       <span className={styles.chip} style={{ ["--chip" as string]: faction.color }}>
         {faction.name}

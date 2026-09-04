@@ -1,0 +1,21 @@
+# BUTTON / RDDT
+
+> One wallet. One press. One shared clock. A Robinhood Chain social experiment inspired by Reddit's 2015 "The Button": a shared 60-second timer that any wallet may reset exactly once, forever, until it reaches zero.
+
+BUTTON is a minimal, permanently unmodifiable smart contract (no admin reset, pause, extension, or upgrade after activation) paired with a frontend that reads all state and history directly from onchain data — no backend, no invented statistics. The BUTTON token has no bearing on participation, access, or outcome; it is a cultural artifact, not a control mechanism.
+
+## Pages
+
+- [Experiment](/): the live countdown, press button, and current shared state
+- [History](/history): every press ever recorded, filterable by wallet, faction, and press number
+- [Stats](/stats): aggregate onchain statistics — total presses, faction distribution, closest calls
+- [Proof](/proof): contract address, deployment/verification details, and reproducible verification instructions
+
+## Rules
+
+1. One wallet gets exactly one press, ever.
+2. A valid press resets the shared clock to 60 seconds.
+3. When the clock reaches zero, the experiment ends permanently — no restart.
+4. The contract has no privileged function reachable after its one-time activation.
+
+Full technical detail, contract source, and verification steps: see the repository README and SECURITY.md.
