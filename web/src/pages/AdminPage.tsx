@@ -38,7 +38,38 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
   const [pendingAction, setPendingAction] = useState<"start" | "resetTimer" | null>(null);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
   const [txStatus, setTxStatus] = useState("");
+  // The database game (what regular users actually see now) and the real
+  // contract are two independent systems this page drives together — but a
+  // network blip could still let them diverge. Tracked separately so a failed
+  // DB sync surfaces its own retry, rather than being silently swallowed into
+  // the onchain status line or requiring a whole new onchain transaction to
+  // try again.
+  const [dbSyncError, setDbSyncError] = useState<{ action: "start" | "resetTimer"; message: string } | null>(null);
+  const [dbSyncing, setDbSyncing] = useState(false);
   const submittingRef = useRef(false);
+
+  const syncDatabase = useCallback(async (action: "start" | "resetTimer") => {
+    setDbSyncing(true);
+    setDbSyncError(null);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: action === "start" ? "start" : "reset" })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setDbSyncError({ action, message: data.message || data.error || "UNKNOWN DATABASE ERROR" });
+        return false;
+      }
+      return true;
+    } catch (error) {
+      setDbSyncError({ action, message: error instanceof Error ? error.message : "COULD NOT REACH THE SERVER" });
+      return false;
+    } finally {
+      setDbSyncing(false);
+    }
+  }, []);
 
   const receipt = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -66,10 +97,26 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         setPendingAction(null);
         return;
       }
-      setTxStatus(action === "start" ? "ACTIVATED · THE CLOCK IS RUNNING" : "TIMER RESET · DEADLINE PUSHED BACK TO A FRESH 60 SECONDS");
+      setTxStatus(
+        action === "start"
+          ? "ACTIVATED ONCHAIN · SYNCING THE DATABASE GAME…"
+          : "TIMER RESET ONCHAIN · SYNCING THE DATABASE GAME…"
+      );
       setPendingAction(null);
+      const dbOk = await syncDatabase(action);
+      if (dbOk) {
+        setTxStatus(
+          action === "start"
+            ? "ACTIVATED · THE CLOCK IS RUNNING FOR EVERYONE"
+            : "TIMER RESET · DEADLINE PUSHED BACK TO A FRESH 60 SECONDS FOR EVERYONE"
+        );
+      } else {
+        setTxStatus(
+          `ONCHAIN ${action === "start" ? "ACTIVATION" : "RESET"} SUCCEEDED, BUT THE DATABASE GAME DID NOT SYNC — USE RETRY BELOW.`
+        );
+      }
     },
-    [publicClient]
+    [publicClient, syncDatabase]
   );
 
   useEffect(() => {
@@ -224,6 +271,15 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
               VIEW TRANSACTION ↗
             </a>
           )}
+        </div>
+      )}
+
+      {dbSyncError && (
+        <div className={styles.txStatus} aria-live="polite">
+          DATABASE SYNC FAILED ({dbSyncError.action === "start" ? "START" : "RESET"}) · {dbSyncError.message}
+          <button type="button" disabled={dbSyncing} onClick={() => syncDatabase(dbSyncError.action)}>
+            {dbSyncing ? "RETRYING…" : "RETRY DATABASE SYNC"}
+          </button>
         </div>
       )}
 

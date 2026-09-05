@@ -1,42 +1,21 @@
 import PressStage from "../components/press/PressStage";
-import LivePressFeed from "../components/feed/LivePressFeed";
-import StatsPanel from "../components/stats/StatsPanel";
 import TokenPanel from "../components/token/TokenPanel";
-import IdentityPanel from "../components/identity/IdentityPanel";
 import RulesSection from "../components/rules/RulesSection";
-import ProofSection from "../components/rules/ProofSection";
-import { useLiveFeed } from "../hooks/useLiveFeed";
-import { runtimeConfig } from "../config/runtimeConfig";
-import type { ExperimentState, UserPressState } from "../domain/types";
-import type { EventSyncStatus } from "../hooks/useEventSync";
-import type { PreviewClockState } from "../hooks/usePreviewClock";
 
-const HOMEPAGE_FEED_LIMIT = 14;
-
-export default function HomePage({
-  state,
-  sync,
-  preview,
-  userPress
-}: {
-  state: ExperimentState;
-  sync: EventSyncStatus;
-  preview: PreviewClockState;
-  userPress: UserPressState;
-}) {
-  const liveEvents = useLiveFeed(sync, HOMEPAGE_FEED_LIMIT);
-  const feed = { events: liveEvents, freshness: sync.freshness, latestKey: sync.latestKey };
-  const events = runtimeConfig.previewMode ? preview.events : liveEvents;
-
+// LivePressFeed, StatsPanel, and IdentityPanel are still wired to the old
+// onchain read layer (App.tsx's useExperimentState/useEventSync) —
+// intentionally left off the homepage rather than shown here half-migrated
+// and disconnected from what PressStage now actually records. /history and
+// /stats are already rebuilt against /api/history and /api/stats (see those
+// pages); a homepage live-tape widget sourced the same way is a natural
+// follow-up, not yet done. See SECURITY.md for the full account of what
+// changed and why.
+export default function HomePage() {
   return (
     <>
-      <PressStage state={state} feed={feed} preview={preview} userPress={userPress} sync={sync} />
-      <LivePressFeed feed={feed} preview={runtimeConfig.previewMode ? preview : null} />
-      <StatsPanel state={state} events={events} preview={runtimeConfig.previewMode ? preview : null} pulseEvent={sync.pulseEvent} />
-      <IdentityPanel preview={preview} userPress={userPress} />
+      <PressStage />
       <TokenPanel />
       <RulesSection />
-      <ProofSection state={state} />
     </>
   );
 }

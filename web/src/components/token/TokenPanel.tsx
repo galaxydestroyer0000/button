@@ -13,7 +13,7 @@ export default function TokenPanel() {
         </h2>
         <p>
           In 2015, Reddit gave the internet a 60-second timer and one irreversible press. More than a million people
-          turned a button into factions, rituals and panic. BUTTON brings the same primitive onchain: one wallet,
+          turned a button into factions, rituals and panic. BUTTON brings the same primitive back: one username,
           one press, one shared clock.
         </p>
         <p className={styles.disclaimer}>The token does not change your access, odds or result in the experiment.</p>

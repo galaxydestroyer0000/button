@@ -33,6 +33,17 @@
 .txStatus { margin-top: 20px; padding: 14px 16px; border: 1px solid #262626; background: #0c0c0c; color: #dbd8d0; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .txStatus a { color: #8c8982; border-bottom: 1px solid #444; }
 .txStatus a:hover { color: #ddd; border-color: #ddd; }
+.txStatus button {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #ddd;
+  padding: 8px 14px;
+  font: 800 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.txStatus button:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+.txStatus button:disabled { opacity: .35; cursor: not-allowed; }
 
 .scheduleCard { margin-top: 32px; border: 1px solid #2a2a2a; background: #0e0e0e; padding: 22px; }
 .scheduleCard h3 { margin: 0 0 10px; font-size: 15px; }

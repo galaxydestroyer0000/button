@@ -1,29 +1,26 @@
 import { useState } from "react";
 import { FACTIONS } from "../domain/factions";
-import { runtimeConfig } from "../config/runtimeConfig";
-import { useEventPage } from "../hooks/useEventPage";
-import FeedRow from "../components/feed/FeedRow";
+import { useHistoryPage } from "../hooks/useHistoryPage";
+import HistoryRow from "../components/feed/HistoryRow";
 import FeedEmptyState from "../components/feed/FeedEmptyState";
 import FeedSkeleton from "../components/feed/FeedSkeleton";
-import type { EventSyncStatus } from "../hooks/useEventSync";
 import styles from "./HistoryPage.module.css";
 
 const PAGE_SIZE = 50;
 
-export default function HistoryPage({ sync }: { sync: EventSyncStatus }) {
+export default function HistoryPage() {
   const [page, setPage] = useState(1);
   const [factionInput, setFactionInput] = useState("");
-  const [presserInput, setPresserInput] = useState("");
+  const [usernameInput, setUsernameInput] = useState("");
   const [pressNumberInput, setPressNumberInput] = useState("");
 
   const faction = factionInput ? Number(factionInput) : undefined;
-  const presser = /^0x[a-fA-F0-9]{40}$/.test(presserInput.trim()) ? (presserInput.trim() as `0x${string}`) : undefined;
+  const username = usernameInput.trim() || undefined;
   const pressNumber = pressNumberInput && /^\d+$/.test(pressNumberInput) ? Number(pressNumberInput) : undefined;
-  const hasActiveFilter = faction !== undefined || presser !== undefined || pressNumber !== undefined;
+  const hasActiveFilter = faction !== undefined || username !== undefined || pressNumber !== undefined;
 
-  const { items, total } = useEventPage(sync, page, PAGE_SIZE, { faction, presser, pressNumber });
+  const { items, total, loading, error } = useHistoryPage(page, { faction, username, pressNumber });
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const loading = sync.freshness === "SYNCING" && total === 0 && !hasActiveFilter;
 
   function updateFilter(setter: (value: string) => void, value: string) {
     setter(value);
@@ -37,7 +34,7 @@ export default function HistoryPage({ sync }: { sync: EventSyncStatus }) {
           <span className={styles.eyebrow}>HISTORY</span>
           <h2>Every press, filterable.</h2>
         </div>
-        <span className={styles.freshness}>{runtimeConfig.previewMode ? "PREVIEW — NO HISTORY" : sync.freshness}</span>
+        <span className={styles.freshness}>{error ? "SERVER ERROR" : "LIVE · DATABASE"}</span>
       </div>
 
       <form className={styles.filters} onSubmit={(e) => e.preventDefault()}>
@@ -53,13 +50,8 @@ export default function HistoryPage({ sync }: { sync: EventSyncStatus }) {
           </select>
         </label>
         <label>
-          WALLET
-          <input
-            type="text"
-            placeholder="0x…"
-            value={presserInput}
-            onChange={(e) => updateFilter(setPresserInput, e.target.value)}
-          />
+          USERNAME
+          <input type="text" placeholder="e.g. closest_call_99" value={usernameInput} onChange={(e) => updateFilter(setUsernameInput, e.target.value)} />
         </label>
         <label>
           PRESS #
@@ -77,7 +69,7 @@ export default function HistoryPage({ sync }: { sync: EventSyncStatus }) {
             className={styles.clear}
             onClick={() => {
               setFactionInput("");
-              setPresserInput("");
+              setUsernameInput("");
               setPressNumberInput("");
               setPage(1);
             }}
@@ -88,18 +80,10 @@ export default function HistoryPage({ sync }: { sync: EventSyncStatus }) {
       </form>
 
       <div className={styles.tape}>
-        {runtimeConfig.previewMode ? (
-          <FeedEmptyState />
-        ) : loading ? (
-          <FeedSkeleton />
-        ) : items.length === 0 ? (
-          <FeedEmptyState />
-        ) : (
-          items.map((event) => <FeedRow key={event.key} event={event} isNew={false} />)
-        )}
+        {loading ? <FeedSkeleton /> : items.length === 0 ? <FeedEmptyState /> : items.map((event) => <HistoryRow key={event.pressNumber} event={event} />)}
       </div>
 
-      {!runtimeConfig.previewMode && total > 0 && (
+      {total > 0 && (
         <div className={styles.pagination}>
           <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
             ← PREV

@@ -24,7 +24,9 @@ test.describe("network switch: wrong network → SWITCH button", () => {
       startUnregistered: false // the target chain is already known to the wallet
     });
 
-    await page.goto("/");
+    // Wallet connection is /admin-only now — see TopBar.tsx's isAdminRoute
+    // guard — regular pages never show a connect-wallet button at all.
+    await page.goto("/admin");
     await page.getByRole("button", { name: /connect wallet/i }).click();
 
     const switchButton = page.getByRole("button", { name: /wrong network/i });
@@ -52,7 +54,9 @@ test.describe("network switch: wrong network → SWITCH button", () => {
       startUnregistered: true // forces switch -> 4902 -> addEthereumChain -> HTTPS rejection
     });
 
-    await page.goto("/");
+    // Wallet connection is /admin-only now — see TopBar.tsx's isAdminRoute
+    // guard — regular pages never show a connect-wallet button at all.
+    await page.goto("/admin");
     await page.getByRole("button", { name: /connect wallet/i }).click();
 
     const switchButton = page.getByRole("button", { name: /wrong network/i });

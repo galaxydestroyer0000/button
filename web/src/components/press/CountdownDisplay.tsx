@@ -25,7 +25,7 @@ export default function CountdownDisplay({
 
   return (
     <div className={styles.wrap} aria-live="polite">
-      <div className={styles.systemLabel}>SHARED TIMER · AUTHORITATIVE STATE ONCHAIN</div>
+      <div className={styles.systemLabel}>SHARED TIMER · LIVE SERVER STATE</div>
       <div ref={timerRef} className={classes} role="timer" aria-label="Shared countdown">
         {reading.label}
       </div>

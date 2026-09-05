@@ -6,6 +6,50 @@ explicit. This document was substantially expanded after a hostile production au
 the hostile audit" below for what that audit actually found and fixed, not just what
 it concluded was fine.
 
+**Read this next section before anything else in this file.** Everything from "What
+the contract enforces" through "Findings from the hostile audit" describes the
+contract as it stood *before* a later, separate operator decision removed the wallet
+requirement for regular presses. All of it is still true and still real — it's just
+no longer what a regular visitor's press goes through. "The database-backed game"
+section, further down, is the trust model that actually governs regular visitors
+today.
+
+## The wallet-removal pivot
+
+Ahead of a real mainnet deployment, the operator judged that asking visitors to
+connect a wallet holding real assets — just to press a button — was a bigger barrier
+than the product could afford, and that the fix wasn't better wallet-connect
+messaging but removing the wallet requirement entirely for regular visitors. This
+was a deliberate, explicit, security-relevant decision, not a quiet refactor, and it
+trades away real guarantees:
+
+- **Independent verifiability is gone for regular presses.** The original design's
+  whole security value proposition was "the rules are enforced by code anyone can
+  read, and every result is checkable by anyone, with no server and no operator
+  trust required." A private Postgres database cannot offer that by construction —
+  there is no cryptographic signature per press, no public ledger, and no way for a
+  visitor to independently confirm a specific press happened the way the site
+  claims. See "The database-backed game" below for exactly what replaced it.
+- **Sybil resistance is gone.** A wallet with real funds and history was never
+  proof-of-personhood, but it was at least a real, non-free resource to acquire. A
+  username costs nothing. "One press per username, forever" is real and permanently
+  enforced; "one press per person" is not enforced at all, in any way.
+- **The operator gained a genuinely new power: full, direct database access.** The
+  original contract was designed so that even a malicious starter couldn't alter
+  press history, faction assignments, or totals through any code path — `resetTimer()`
+  was deliberately built to prove this (see below). The database has no equivalent
+  protection: the operator can edit any row directly. Nothing in this codebase
+  prevents that. This is stated here because it's true, not because it's been
+  mitigated.
+- **What's unaffected:** the smart contract itself, its `onlyStarter` guarantees, and
+  everything below through "Findings from the hostile audit" remain exactly as
+  audited and described — they're just now exercised only by the operator's own
+  `/admin` actions, disconnected from what a regular visitor does.
+
+See "Change made after the hostile audit: removing the wallet requirement" near the
+end of this document for when this happened relative to the audit below, matching
+the same disclosure pattern already used for the `resetTimer()` addition.
+
 ## What the contract enforces
 
 - one successful press per wallet address
@@ -17,10 +61,12 @@ it concluded was fine.
 
 The contract is the sole source of truth for all of the above. Every frontend
 guard described below (disabled buttons, client-side "already pressed" checks,
-network-level races) is a UX convenience, not a security boundary — the E2E suite
-(`web/e2e/second-press-rejected.spec.ts`) specifically proves this by bypassing the
-frontend's own guards and confirming the *contract* is what actually stops a second
-press.
+network-level races) is a UX convenience, not a security boundary — the Foundry
+suite (`contracts/test/ButtonExperiment.t.sol`) proves this at the contract level
+directly. (An earlier E2E test, `web/e2e/second-press-rejected.spec.ts`, proved the
+same thing through the real UI by bypassing the frontend's own guards; it was
+removed when the wallet-based press flow it exercised was replaced — see "The
+database-backed game" below for what a regular press goes through now.)
 
 ## Contract trust assumptions
 
@@ -157,8 +203,10 @@ everything above is its complete scope.
 ## `/admin` access control
 
 `/admin` (`web/src/pages/AdminPage.tsx`) is the operator UI for `start()` and
-`resetTimer()`. It has two independent layers, and it's worth being precise about
-what each one actually does:
+`resetTimer()` — and, since the wallet-removal pivot, also drives the
+database-backed game via `POST /api/admin` (see "The database-backed game" below
+for what that endpoint does). It has two independent layers, and it's worth being
+precise about what each one actually does:
 
 - **The contract's `onlyStarter` check is the real security boundary.** It's
   enforced by every node on the network, cannot be bypassed by finding the page,
@@ -172,7 +220,20 @@ what each one actually does:
   read server-side only, from Vercel's own project environment variables — never
   `VITE_`-prefixed, never shipped to the client. It fails closed: if either
   variable is unset on a deployment, `/admin` returns `401` for everyone,
-  including the real starter, rather than silently falling open.
+  including the real starter, rather than silently falling open. The same matcher
+  and the same realm cover `POST /api/admin`, so a browser that already
+  authenticated to load `/admin` sends its cached credentials on that request too —
+  no separate login step, and no unauthenticated caller can reach it either.
+
+**How the two systems stay in sync (and what happens when they don't).** After a
+real onchain `start()`/`resetTimer()` transaction succeeds, `AdminPage.tsx` calls
+`POST /api/admin` to apply the same action to the database. If that call fails —
+a network blip, the database being briefly unreachable — the onchain transaction
+has already succeeded and cannot be undone, but the database has not been updated
+to match. This is surfaced explicitly (a "DATABASE SYNC FAILED" status with a
+dedicated retry button that re-calls `/api/admin` alone, without needing another
+onchain transaction) rather than silently assumed to have worked. The two systems
+*can* diverge; the failure mode is visible and recoverable, not silent.
 
 **What this layer is for, and what it isn't for.** It exists to keep the operator
 UI off crawlers, off link previews, and away from anyone who stumbles onto or
@@ -200,6 +261,85 @@ top of the `401` most of them would get anyway.
   against a real deployment, since that would require linking this project to a
   Vercel account from this environment — deliberately not attempted without the
   operator's explicit go-ahead.
+
+## The database-backed game
+
+This is the trust model that actually governs a regular visitor's press today —
+everything above this point describes the contract, which `/admin` still uses but
+regular presses no longer touch.
+
+**What it is:** a Postgres database (provisioned via Vercel's Neon integration),
+queried through a handful of Vercel Functions (`web/api/`): `state.ts` (read the
+shared countdown/totals), `press.ts` (submit a press), `history.ts`/`stats.ts`
+(read past presses and aggregates), `admin.ts` (start/reset, gated as described
+above). Schema in `web/api/schema.sql`: a single-row `game_state` table (started,
+deadline, totals, closest call) and a `presses` table (one row per successful
+press, keyed by username).
+
+**What it enforces, for real:**
+
+- **One press per username, forever, case-insensitively.** `presses_username_lower_idx`
+  is a Postgres `UNIQUE` index on `lower(username)` — a second press attempt for
+  the same username (any casing) fails the `INSERT` with a `23505` unique-violation
+  error, which `press.ts` catches and reports as `ALREADY_PRESSED`. This is a real,
+  atomic, race-safe constraint enforced by the database engine itself, not an
+  application-level check-then-write that a concurrent request could slip past.
+- **Faction and remaining-seconds are computed server-side, from the server's own
+  clock, at the moment the request is processed** — never from anything the
+  client sends — mirroring exactly what `block.timestamp`-at-execution-time did
+  onchain. `factionForRemaining` is the same pure function imported directly from
+  `src/domain/factions.ts`, not a reimplementation that could silently drift from
+  the client-displayed logic.
+- **Deadline/total-count updates are atomic single `UPDATE` statements** (e.g.
+  `total_presses = total_presses + 1` in the same statement as the deadline write),
+  safe under concurrent presses because Postgres serializes row-level writes — not
+  a read-modify-write race across two round trips.
+- **`start()`/`reset` mirror the contract's own guards**: start fails with
+  `ALREADY_STARTED` if already started; reset fails with `NOT_ALIVE` if the game
+  isn't currently alive — the same "can never revive a dead experiment" property,
+  just enforced by an application-level check against `game_state.deadline`
+  instead of a Solidity `require`.
+- Verified directly against a real database, not mocked: `web/api/press.test.ts`
+  runs the actual handler functions against real Postgres (start-once, one-press-
+  per-username case-insensitively, faction assignment, rejection before start and
+  after death, state consistency), cleaning up every row it creates.
+
+**What it deliberately does not, and cannot, enforce — stated plainly, not
+mitigated:**
+
+- **No independent verification.** There is no cryptographic signature per press,
+  no public ledger, and no way for a visitor to check a specific press against a
+  source that isn't this database. "Trust the operator's server" is the actual
+  model, the same as any ordinary web app — not a smart contract's model.
+- **No Sybil resistance whatsoever.** The unique index makes a *username*
+  permanently spent; it does nothing to stop one person from using an unlimited
+  number of different usernames. A wallet with real funds and transaction history
+  was never proof-of-personhood either, but it was at least a real, costly
+  resource; a username is free.
+- **No rate limiting, CAPTCHA, or bot detection on the public endpoints.**
+  `POST /api/press` has no wallet to authenticate against, by design — but that
+  also means it has no gas cost and no per-caller throttling of any kind. A
+  scripted client could submit an unbounded number of disposable usernames per
+  second. This cannot let anyone press twice (the unique index still holds), but
+  it could: keep the deadline perpetually reset (denying the "ends forever"
+  outcome participant behavior is supposed to produce), or flood `/history` and
+  the leaderboard with junk entries. **This is a real, currently-unmitigated gap,
+  listed here and in the "Before mainnet" checklist below — not something this
+  document is claiming is fine.**
+- **The operator has full, direct, unaudited access to the database.** Unlike the
+  contract — where `resetTimer()` was deliberately built and proven (via the
+  invariant tests cited above) to be incapable of altering press history no matter
+  what the starter does — nothing in this codebase stops the operator from editing
+  any row in Postgres directly: changing a past press's faction, fabricating a
+  closest call, deleting a row. This is a pure trust relationship for this half of
+  the system. Said here because it's true, not because there's a mitigation to
+  point to.
+- **A malformed or missing database connection fails closed, not silently.**
+  Every route in `web/api/_db.ts` throws immediately if `DATABASE_URL` is unset;
+  every handler catches its own errors and returns a real HTTP error status
+  (never a fabricated 200 with placeholder data). The frontend's `useGameState`/
+  `useStats`/`useHistoryPage` hooks surface a `SERVER ERROR`/stale state rather
+  than guessing.
 
 ## Non-upgradeability
 
@@ -292,7 +432,10 @@ onchain lifecycle end-to-end. What it found and fixed:
 What the audit deliberately did *not* change: the core experiment rules (one
 wallet, one press, 60 seconds, permanent death at zero), the no-backend/no-indexer
 architecture, and the decision not to add WalletConnect (see above) — these were
-reviewed and are documented as accepted tradeoffs, not gaps.
+reviewed and are documented as accepted tradeoffs, not gaps, **at the time of the
+audit.** The no-backend architecture was later revised by explicit operator
+decision — see the next section but one — for reasons unrelated to anything the
+audit found.
 
 ## Change made after the hostile audit: the admin timer-reset power
 
@@ -313,17 +456,49 @@ is immutable) — a new deployment with the updated bytecode is required, and mu
 go through the same deploy → verify → configure → lifecycle-test sequence as any
 other deployment before it's treated as the real one.
 
+## Change made after the hostile audit: removing the wallet requirement
+
+Like the `resetTimer()` addition above, this happened **after** the hostile audit
+concluded, as a separate, deliberate operator decision — not a finding from that
+audit, and not related to anything it found. The audit's own conclusions about the
+contract (everything from "What the contract enforces" through "Findings from the
+hostile audit") remain accurate; they just describe a system regular visitors no
+longer interact with.
+
+The reason, stated plainly: ahead of a real mainnet deployment, the operator judged
+that requiring a wallet holding real assets to press a button was a bigger barrier
+to participation than the product could afford, and that the honest fix was
+removing the requirement, not disguising it. "The database-backed game" section
+above is the complete account of what that costs (independent verifiability, Sybil
+resistance) and what it doesn't touch (the contract itself, still real, still
+operated by `/admin`).
+
+This was a genuine second pivot in this document's history, and it's recorded here
+for the same reason the `resetTimer()` change is: so nobody reading only the older
+sections of this file mistakes them for a description of what ships today.
+
 ## Operational risk
 
-Activation is irreversible. Deploy the contract in the sealed state first, publish and verify the website, then call `start()` only when the public interface is ready.
+Activation is irreversible on both systems now. Deploy the contract in the sealed
+state first, publish and verify the website, then activate the database game from
+`/admin` only when the public interface is ready — the first 60-second window
+begins the instant that happens, and there is no second run.
 
 ## Before mainnet
 
 - run the full Foundry test suite (`cd contracts && forge test -vv`)
-- run the frontend unit/integration suite (`cd web && npm test`)
+- run the frontend unit/integration suite (`cd web && npm test`) — includes
+  `web/api/press.test.ts` against a real database
 - run the end-to-end suite against a real local chain (`cd web && npm run test:e2e`)
 - deploy to Robinhood Chain testnet
 - run the complete live → press → reset → expiry lifecycle with multiple wallets
+- **add rate limiting (or equivalent abuse protection) to `POST /api/press` before
+  any real launch** — see "The database-backed game" above; this is the one
+  concretely unmitigated gap this document identifies, not a hypothetical
+- decide on, and document, an operational safeguard for direct database access
+  (who has the credential, is every write logged, is there a way to detect an
+  out-of-band edit) — there is currently none beyond "trust the operator," which
+  should be a conscious decision before real users' presses depend on it
 - verify the source code on Blockscout
 - confirm the production frontend points at the exact verified address and deploy block
 - independently review the contract; do not treat this repository as an audit

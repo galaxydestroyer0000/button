@@ -4,6 +4,7 @@ web/dist/
 web/node_modules/
 .env
 .env.local
+.env.vercel
 .DS_Store
 *.log
 contracts/cache/
@@ -17,3 +18,5 @@ web/blob-report/
 *.tsbuildinfo
 
 .worktrees/
+.vercel
+.claude/

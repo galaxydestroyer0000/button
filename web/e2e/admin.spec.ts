@@ -114,6 +114,27 @@ async function useAdminTestConfig(page: import("@playwright/test").Page, address
   );
 }
 
+/** These tests run against a plain `vite` webServer (see playwright.config.ts),
+ *  which never serves web/api/* — that's a Vercel Functions convention, not a
+ *  Vite one. AdminPage now calls POST /api/admin right after a successful
+ *  onchain tx to keep the database-backed game in sync (see AdminPage.tsx's
+ *  syncDatabase); mocked here so these tests keep verifying what they're
+ *  actually about — real onchain contract enforcement — without needing a
+ *  full `vercel dev` + real database in this environment. The database side
+ *  of that sync is verified separately, directly against the real database. */
+async function mockDatabaseSync(page: import("@playwright/test").Page): Promise<void> {
+  await page.route("**/api/admin", (route) => {
+    const body = JSON.parse(route.request().postData() || "{}");
+    const now = new Date().toISOString();
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify(
+        body.action === "start" ? { started: true, startedAt: now, deadline: now } : { deadline: now, resetCount: 1 }
+      )
+    });
+  });
+}
+
 test.describe("admin page: start() and resetTimer()", () => {
   test("a non-starter wallet sees ACCESS DENIED and cannot submit either action", async ({ page }) => {
     await useAdminTestConfig(page);
@@ -136,6 +157,7 @@ test.describe("admin page: start() and resetTimer()", () => {
     // fix (mirroring PressStage's existing guard) is: switch first, submit second.
     const freshContract = await deployFreshContract();
     await useAdminTestConfig(page, freshContract);
+    await mockDatabaseSync(page);
     const SOME_OTHER_CHAIN_ID = 1;
     await installInjectedWallet(page, {
       address: starterAccount.address,
@@ -170,6 +192,8 @@ test.describe("admin page: start() and resetTimer()", () => {
 
   test("the starter wallet can activate the experiment", async ({ page }) => {
     await useAdminTestConfig(page);
+    await mockDatabaseSync(page);
+    const dbAdminRequest = page.waitForRequest("**/api/admin");
     await installInjectedWallet(page, { address: starterAccount.address, rpcUrl: RPC_URL, chainId: CHAIN_ID });
     await page.goto("/admin");
     await page.getByRole("button", { name: /connect wallet/i }).click();
@@ -183,12 +207,19 @@ test.describe("admin page: start() and resetTimer()", () => {
     // Scoped to the facts panel — the footer's own network-status strip also
     // renders the text "LIVE" for its own unrelated purpose.
     await expect(page.locator("[class*=facts]").getByText("LIVE", { exact: true })).toBeVisible({ timeout: 15_000 });
+
+    // Proves the glue code, not just the copy: a real onchain success must
+    // actually request the database sync with the right action.
+    const request = await dbAdminRequest;
+    expect(JSON.parse(request.postData() || "{}")).toEqual({ action: "start" });
   });
 
   test("the starter wallet can reset the timer while the experiment is alive", async ({ page }) => {
     // This test's own contract was started in the previous test (shared across
     // this describe block's tests, same as production: one contract, one lifecycle).
     await useAdminTestConfig(page);
+    await mockDatabaseSync(page);
+    const dbAdminRequest = page.waitForRequest("**/api/admin");
     await installInjectedWallet(page, { address: starterAccount.address, rpcUrl: RPC_URL, chainId: CHAIN_ID });
     await page.goto("/admin");
     await page.getByRole("button", { name: /connect wallet/i }).click();
@@ -198,6 +229,9 @@ test.describe("admin page: start() and resetTimer()", () => {
     await resetButton.click();
 
     await expect(page.getByText("TIMER RESET · DEADLINE PUSHED BACK TO A FRESH 60 SECONDS")).toBeVisible({ timeout: 20_000 });
+
+    const request = await dbAdminRequest;
+    expect(JSON.parse(request.postData() || "{}")).toEqual({ action: "reset" });
   });
 
   test("resetTimer() rejected with the correct explanation when the deadline passes while the transaction is in flight, not a raw error or a hang", async ({ page }) => {

@@ -32,7 +32,7 @@ export default function IdentityCard({ data, shareable = false }: { data: Identi
         <span className={styles.unit}>SECOND{data.remaining === 1 ? "" : "S"}</span>
       </div>
       <div className={styles.faction}>{f.name}</div>
-      <div className={styles.wallet}>{shortAddress(data.presser)}</div>
+      <div className={styles.wallet}>{data.presser.startsWith("0x") ? shortAddress(data.presser) : data.presser || "—"}</div>
 
       <div className={styles.quote}>&ldquo;I waited until {numberToWord(data.remaining)}.&rdquo;</div>
 

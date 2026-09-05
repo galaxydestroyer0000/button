@@ -1,6 +1,6 @@
 import { useAccount, useConnect, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { shortAddress } from "../../domain/format";
 import { runtimeConfig } from "../../config/runtimeConfig";
 import { isSoundEnabled, playTone, setSoundEnabled } from "../../audio/tick";
@@ -8,6 +8,11 @@ import { useRef, useState } from "react";
 import styles from "./TopBar.module.css";
 
 export default function TopBar() {
+  // Wallet connection only means anything on /admin now — regular visitors
+  // never touch a wallet (see the /admin-only-onchain pivot in SECURITY.md),
+  // so showing "CONNECT WALLET" everywhere else was actively misleading
+  // about what pressing the button actually requires.
+  const isAdminRoute = useLocation().pathname.startsWith("/admin");
   const { address, isConnected, chainId } = useAccount();
   const { connect, isPending: connecting, error: connectError } = useConnect();
   const { switchChain, error: switchError } = useSwitchChain();
@@ -120,20 +125,24 @@ export default function TopBar() {
           <button type="button" className={styles.soundBtn} aria-pressed={soundOn} onClick={toggleSound}>
             {soundOn ? "SOUND ON" : "SOUND OFF"}
           </button>
-          <button
-            type="button"
-            className={styles.networkPill}
-            onClick={handleNetworkClick}
-            style={wrongNetwork ? { color: "#f4d03f", borderColor: "#f4d03f" } : undefined}
-          >
-            {wrongNetwork ? "WRONG NETWORK · SWITCH" : networkLabel}
-          </button>
-          <button type="button" className={styles.walletBtn} onClick={handleWalletClick} disabled={connecting}>
-            {walletLabel}
-          </button>
+          {isAdminRoute && (
+            <>
+              <button
+                type="button"
+                className={styles.networkPill}
+                onClick={handleNetworkClick}
+                style={wrongNetwork ? { color: "#f4d03f", borderColor: "#f4d03f" } : undefined}
+              >
+                {wrongNetwork ? "WRONG NETWORK · SWITCH" : networkLabel}
+              </button>
+              <button type="button" className={styles.walletBtn} onClick={handleWalletClick} disabled={connecting}>
+                {walletLabel}
+              </button>
+            </>
+          )}
         </div>
       </header>
-      {walletErrorMessage && (
+      {isAdminRoute && walletErrorMessage && (
         <div className={styles.walletError} role="alert">
           {walletErrorMessage}
         </div>

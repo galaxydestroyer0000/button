@@ -1,13 +1,11 @@
+import { useMemo } from "react";
 import { FACTIONS } from "../domain/factions";
-import { formatDuration, shortAddress } from "../domain/format";
-import { runtimeConfig } from "../config/runtimeConfig";
+import { formatDuration } from "../domain/format";
 import { useCountdown } from "../hooks/useCountdown";
-import { useWindowCounts } from "../hooks/useWindowCounts";
-import { useHourlyBuckets } from "../hooks/useHourlyBuckets";
-import { useLiveFeed } from "../hooks/useLiveFeed";
-import { useClosestCalls } from "../hooks/useClosestCalls";
-import { useLegendaryPresses } from "../hooks/useLegendaryPresses";
-import { useMilestones } from "../hooks/useMilestones";
+import { useGameState } from "../hooks/useGameState";
+import { useStats } from "../hooks/useStats";
+import { useAllPresses } from "../hooks/useAllPresses";
+import { windowCounts, hourlyBuckets, closestCalls, legendaryPresses, milestones } from "../domain/statsDerivations";
 import StatTile from "../components/stats/StatTile";
 import FactionBars from "../components/stats/FactionBars";
 import HourlyChart from "../components/stats/HourlyChart";
@@ -15,111 +13,84 @@ import FactionLeaderboard from "../components/culture/FactionLeaderboard";
 import HallOfFame from "../components/culture/HallOfFame";
 import LegendaryPresses from "../components/culture/LegendaryPresses";
 import Milestones from "../components/culture/Milestones";
-import type { ExperimentState } from "../domain/types";
-import type { EventSyncStatus } from "../hooks/useEventSync";
-import type { PreviewClockState } from "../hooks/usePreviewClock";
 import styles from "./StatsPage.module.css";
 
 const LEGENDARY_MAX_SECONDS = 2;
 
-export default function StatsPage({ state, sync, preview }: { state: ExperimentState; sync: EventSyncStatus; preview: PreviewClockState }) {
-  const windowCounts = useWindowCounts(sync);
-  const hourlyBuckets = useHourlyBuckets(sync);
-  const recent = useLiveFeed(sync, 1);
-  const latest = runtimeConfig.previewMode ? preview.events[0] : recent[0];
-  const closestCalls = useClosestCalls(sync, 10);
-  const legendary = useLegendaryPresses(sync, LEGENDARY_MAX_SECONDS);
-  const milestones = useMilestones(sync, runtimeConfig.previewMode ? 0 : state.totalPresses);
+export default function StatsPage() {
+  const state = useGameState();
+  const stats = useStats();
+  const { events, loaded: eventsLoaded } = useAllPresses();
 
-  const deadlineMs = runtimeConfig.previewMode ? preview.deadlineMs : state.loaded ? state.deadline * 1000 - state.chainOffsetMs : null;
-  const alive = runtimeConfig.previewMode ? preview.deadlineMs > Date.now() : state.started && state.alive;
-  const reading = useCountdown(deadlineMs, { sealed: !runtimeConfig.previewMode && !state.started, alive });
-
-  const total = runtimeConfig.previewMode ? preview.total : state.totalPresses;
-  const closest = runtimeConfig.previewMode ? preview.closest : state.closestCall;
-  const closestWallet = runtimeConfig.previewMode ? "" : state.closestCallWallet;
-  const counts = runtimeConfig.previewMode ? preview.factionCounts : state.factionCounts;
-
-  const ageSeconds = runtimeConfig.previewMode
-    ? (Math.min(Date.now(), preview.deadlineMs) - preview.startedAtMs) / 1000
-    : state.started
-      ? Math.max(0, (state.alive ? Date.now() + state.chainOffsetMs : state.deadline * 1000) / 1000 - state.startedAt)
-      : NaN;
-
+  const nowSec = Math.floor(Date.now() / 1000);
+  const counts = useMemo(() => windowCounts(events, nowSec), [events, nowSec]);
+  const buckets = useMemo(() => hourlyBuckets(events, nowSec), [events, nowSec]);
+  const closest = useMemo(() => closestCalls(events, 10), [events]);
+  const legendary = useMemo(() => legendaryPresses(events, LEGENDARY_MAX_SECONDS), [events]);
+  const milestoneList = useMemo(() => milestones(events, stats.totalPresses), [events, stats.totalPresses]);
+  const latest = events.length > 0 ? events[events.length - 1] : null;
   const latestFaction = latest ? FACTIONS[latest.faction] : null;
+
+  const factionCountsArray = useMemo(() => {
+    const arr = [0, 0, 0, 0, 0, 0, 0];
+    for (const [faction, count] of Object.entries(stats.factionCounts)) arr[Number(faction)] = count;
+    return arr;
+  }, [stats.factionCounts]);
+
+  const reading = useCountdown(state.deadlineMs, { sealed: !state.started, alive: state.started && state.alive });
 
   return (
     <section className={styles.section} aria-label="Richer experiment statistics">
       <div className={styles.head}>
         <span className={styles.eyebrow}>STATS</span>
-        <h2>Every number here is read from the chain.</h2>
-        <p>No invented volume, user counts, or market metrics — only what the contract and its own event history can prove.</p>
+        <h2>Every number here is read from the database.</h2>
+        <p>No invented volume, user counts, or market metrics — only what the server's own records can prove.</p>
       </div>
 
       <div className={styles.grid}>
-        <StatTile
-          label="TOTAL PRESSES"
-          value={runtimeConfig.previewMode ? total.toLocaleString() : state.loaded ? total.toLocaleString() : "—"}
-          caption="every successful press, ever"
-        />
+        <StatTile label="TOTAL PRESSES" value={stats.loaded ? stats.totalPresses.toLocaleString() : "—"} caption="every successful press, ever" />
         <StatTile
           label="UNIQUE PRESSERS"
-          value={runtimeConfig.previewMode ? total.toLocaleString() : state.loaded ? total.toLocaleString() : "—"}
-          caption="one wallet = one press, always equal to total presses"
+          value={stats.loaded ? stats.totalPresses.toLocaleString() : "—"}
+          caption="one username = one press, always equal to total presses"
         />
         <StatTile
           label="CLOSEST CALL EVER"
-          value={total ? `${closest}s` : "—"}
-          caption={closestWallet ? shortAddress(closestWallet) : "lowest clock at press"}
+          value={stats.totalPresses ? `${stats.closestCallSeconds}s` : "—"}
+          caption={stats.closestCallUsername || "lowest clock at press"}
         />
         <StatTile
           label="MOST RECENT PRESS"
           value={latest ? `${latest.remaining}s — ${latestFaction!.name}` : "—"}
-          caption={latest ? shortAddress(latest.presser) : "no presses yet"}
+          caption={latest ? latest.presser : "no presses yet"}
         />
-        <StatTile label="EXPERIMENT UPTIME" value={Number.isFinite(ageSeconds) ? formatDuration(ageSeconds) : "—"} caption="since activation" />
-        <StatTile label="CURRENT COUNTDOWN" value={reading.label} caption="interpolated locally, resynced from chain" />
-        <StatTile
-          label="PRESSES · LAST HOUR"
-          value={runtimeConfig.previewMode ? "—" : windowCounts.lastHour.toLocaleString()}
-          caption="from indexed history"
-        />
-        <StatTile
-          label="PRESSES · LAST 24H"
-          value={runtimeConfig.previewMode ? "—" : windowCounts.last24h.toLocaleString()}
-          caption="from indexed history"
-        />
+        <StatTile label="EXPERIMENT UPTIME" value={stats.uptimeSeconds != null ? formatDuration(stats.uptimeSeconds) : "—"} caption="since activation" />
+        <StatTile label="CURRENT COUNTDOWN" value={reading.label} caption="interpolated locally, resynced from the server" />
+        <StatTile label="PRESSES · LAST HOUR" value={eventsLoaded ? counts.lastHour.toLocaleString() : "—"} caption="from the database" />
+        <StatTile label="PRESSES · LAST 24H" value={eventsLoaded ? counts.last24h.toLocaleString() : "—"} caption="from the database" />
       </div>
 
       <div className={styles.sectionGap}>
         <span className={styles.eyebrow}>FACTION DISTRIBUTION</span>
         <div className={styles.spacer} />
-        <FactionBars counts={counts} total={total} pulseEvent={sync.pulseEvent} />
+        <FactionBars counts={factionCountsArray} total={stats.totalPresses} />
       </div>
 
       <div className={styles.sectionGap}>
-        {runtimeConfig.previewMode ? (
-          <div className={styles.previewNotice}>PREVIEW MODE HAS NO INDEXED HISTORY · CONFIGURE A CONTRACT TO SEE REAL CHARTS</div>
-        ) : (
-          <HourlyChart buckets={hourlyBuckets} />
-        )}
+        <HourlyChart buckets={buckets} />
       </div>
 
       <div className={styles.sectionGap}>
         <span className={styles.eyebrow}>FACTION LEADERBOARD</span>
         <p className={styles.sectionNote}>Ranked by participant count only. No token ownership, no weighting.</p>
         <div className={styles.spacer} />
-        <FactionLeaderboard counts={counts} />
+        <FactionLeaderboard counts={factionCountsArray} />
       </div>
 
       <div className={styles.sectionGap}>
         <span className={styles.eyebrow}>CLOSEST-CALL HALL OF FAME</span>
         <div className={styles.spacer} />
-        {runtimeConfig.previewMode ? (
-          <div className={styles.previewNotice}>PREVIEW MODE HAS NO INDEXED HISTORY</div>
-        ) : (
-          <HallOfFame events={closestCalls} />
-        )}
+        <HallOfFame events={closest} />
       </div>
 
       <div className={styles.sectionGap}>
@@ -129,21 +100,13 @@ export default function StatsPage({ state, sync, preview }: { state: ExperimentS
           as close as anyone can ever get.
         </p>
         <div className={styles.spacer} />
-        {runtimeConfig.previewMode ? (
-          <div className={styles.previewNotice}>PREVIEW MODE HAS NO INDEXED HISTORY</div>
-        ) : (
-          <LegendaryPresses events={legendary} />
-        )}
+        <LegendaryPresses events={legendary} />
       </div>
 
       <div className={styles.sectionGap}>
         <span className={styles.eyebrow}>MILESTONES</span>
         <div className={styles.spacer} />
-        {runtimeConfig.previewMode ? (
-          <div className={styles.previewNotice}>PREVIEW MODE HAS NO INDEXED HISTORY</div>
-        ) : (
-          <Milestones milestones={milestones} />
-        )}
+        <Milestones milestones={milestoneList} />
       </div>
     </section>
   );

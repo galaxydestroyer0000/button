@@ -6,8 +6,6 @@ import GlobalPulse from "./components/common/GlobalPulse";
 import HomePage from "./pages/HomePage";
 import { useExperimentState } from "./hooks/useExperimentState";
 import { useEventSync } from "./hooks/useEventSync";
-import { usePreviewClock } from "./hooks/usePreviewClock";
-import { useUserPress } from "./hooks/useUserPress";
 
 // The homepage is the entry point for nearly every visitor and stays in the main
 // bundle; these secondary pages are split into their own chunks so a first-time
@@ -46,19 +44,17 @@ export default function App() {
   // One sync instance for the whole app session — it must not restart on every route
   // change, so it's owned here, above the router, and its status/data flow down.
   const sync = useEventSync(state);
-  const preview = usePreviewClock();
-  const userPress = useUserPress();
 
   return (
     <AppShell footer={<SystemStrip state={state} />}>
       <GlobalPulse pulseEvent={sync.pulseEvent} />
       <Routes>
-        <Route path="/" element={<HomePage state={state} sync={sync} preview={preview} userPress={userPress} />} />
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/history"
           element={
             <Suspense fallback={<RouteLoading />}>
-              <HistoryPage sync={sync} />
+              <HistoryPage />
             </Suspense>
           }
         />
@@ -66,7 +62,7 @@ export default function App() {
           path="/stats"
           element={
             <Suspense fallback={<RouteLoading />}>
-              <StatsPage state={state} sync={sync} preview={preview} />
+              <StatsPage />
             </Suspense>
           }
         />
@@ -90,7 +86,7 @@ export default function App() {
           path="/proof"
           element={
             <Suspense fallback={<RouteLoading />}>
-              <ProofPage state={state} />
+              <ProofPage />
             </Suspense>
           }
         />
