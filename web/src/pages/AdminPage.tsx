@@ -190,6 +190,14 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
     onFire: () => callAction("start")
   });
 
+  const signOut = useCallback(async () => {
+    try {
+      await fetch("/api/admin-logout", { method: "POST" });
+    } finally {
+      window.location.href = "/";
+    }
+  }, []);
+
   if (runtimeConfig.previewMode) {
     return (
       <section className={styles.section}>
@@ -201,7 +209,12 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
   return (
     <section className={styles.section}>
       <div className={styles.head}>
-        <span className={styles.eyebrow}>ADMIN</span>
+        <div className={styles.headRow}>
+          <span className={styles.eyebrow}>ADMIN</span>
+          <button type="button" className={styles.signOut} onClick={signOut}>
+            SIGN OUT
+          </button>
+        </div>
         <h2>Operator controls.</h2>
         <p className={styles.lede}>
           This page has no special access to the contract. Everything here is a plain transaction that the contract itself accepts

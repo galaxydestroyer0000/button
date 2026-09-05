@@ -1,5 +1,16 @@
 .section { border: 1px solid var(--line); padding: 58px 48px; }
 .head { margin-bottom: 26px; }
+.headRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.signOut {
+  border: 1px solid #3a3a3a;
+  background: #171717;
+  color: #8c8982;
+  padding: 8px 14px;
+  font: 800 10px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.signOut:hover { border-color: var(--red); color: var(--red); }
 .head h2 { margin: 6px 0 0; font-size: clamp(26px,3.6vw,48px); letter-spacing: -.05em; line-height: .98; }
 .eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
 .lede { margin-top: 14px; max-width: 680px; color: #aaa69e; font-size: 14px; line-height: 1.6; }
