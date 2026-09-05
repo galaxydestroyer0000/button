@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sql, getGameState, isAlive } from "./_db";
+import { sql, getGameState, isAlive } from "./_db.js";
 
 /** Aggregate stats computed live from the real `presses` table on every
  *  request — faction distribution, uptime, closest call — the database

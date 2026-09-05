@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sql, WINDOW_SECONDS, getGameState, isAlive, validateUsername } from "./_db";
-import { factionForRemaining } from "../src/domain/factions";
+import { sql, WINDOW_SECONDS, getGameState, isAlive, validateUsername } from "./_db.js";
+import { factionForRemaining } from "../src/domain/factions.js";
 
 /** The database-backed equivalent of the contract's press() — same rules
  *  (one username forever, resets the clock to a fresh 60s, faction by

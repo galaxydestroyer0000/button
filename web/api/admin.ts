@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { sql, WINDOW_SECONDS, getGameState, isAlive } from "./_db";
+import { sql, WINDOW_SECONDS, getGameState, isAlive } from "./_db.js";
 
 /** The database-backed equivalent of start()/resetTimer() — called by
  *  AdminPage right after the real onchain transaction succeeds, so one click

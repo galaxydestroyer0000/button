@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getGameState, isAlive } from "./_db";
+import { getGameState, isAlive } from "./_db.js";
 
 /** The database-backed equivalent of useExperimentState's onchain reads — same
  *  shape of answer (started/alive/deadline/totals), just from Postgres instead

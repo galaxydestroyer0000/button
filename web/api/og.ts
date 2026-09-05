@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createPublicClient, http, type AbiEvent } from "viem";
-import { buttonExperimentAbi } from "../src/abi/buttonExperiment";
-import { NETWORKS } from "../src/config/network";
-import { FACTIONS } from "../src/domain/factions";
+import { buttonExperimentAbi } from "../src/abi/buttonExperiment.js";
+import { NETWORKS } from "../src/config/network.js";
+import { FACTIONS } from "../src/domain/factions.js";
 
 /**
  * Serves real, per-press or per-wallet OpenGraph tags to crawlers that fetch a
