@@ -28,6 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       lastPressFaction: state.last_press_faction,
       lastPressRemainingSeconds: state.last_press_remaining_seconds,
       resetCount: state.reset_count,
+      tokenCA: state.token_ca,
       serverNow: now.toISOString()
     });
   } catch (error) {

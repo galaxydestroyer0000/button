@@ -1,7 +1,4 @@
 .banner {
-  position: sticky;
-  top: 0;
-  z-index: 200;
   background: #f4d03f;
   color: #080808;
   text-align: center;

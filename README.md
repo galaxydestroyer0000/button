@@ -48,7 +48,7 @@ OPERATOR'S BROWSER  →  WALLET  →  ROBINHOOD CHAIN (JSON-RPC)  →  ButtonExp
                         (via /admin only — independent of the system above)
 ```
 
-Two independent systems. A regular visitor never touches a wallet, gas, or Robinhood Chain at all — pressing is a plain `POST /api/press` call, and the countdown/history/stats pages poll `GET /api/state`, `/api/history`, `/api/stats`. Those routes (`web/api/`) are Vercel Functions backed by a Postgres database (provisioned via Vercel's Neon integration) — see `web/api/schema.sql` for the two-table schema and `web/api/_db.ts` for the shared query helpers. The operator's `/admin` page is the only part of the app that still touches the smart contract, gated by both a real wallet signature (the contract's own `onlyStarter` check) and a separate Basic Auth layer in front of the route itself (`web/middleware.ts`) — see `SECURITY.md` for the full breakdown of both.
+Two independent systems. A regular visitor never touches a wallet, gas, or Robinhood Chain at all — pressing is a plain `POST /api/press` call, and the countdown/history/stats pages poll `GET /api/state`, `/api/history`, `/api/stats`. Those routes (`web/api/`) are Vercel Functions backed by a Postgres database (provisioned via Vercel's Neon integration) — see `web/api/schema.sql` for the two-table schema and `web/api/_db.ts` for the shared query helpers. The operator's `/admin` page is the only part of the app that still touches the smart contract, gated by both a real wallet signature (the contract's own `onlyStarter` check) and a separate session-cookie login in front of the route itself (`web/middleware.ts`) — see `SECURITY.md` for the full breakdown of both.
 
 Network parameters for the contract admin still operates (verified against Robinhood Chain's own docs, not assumed):
 
@@ -74,10 +74,10 @@ Repository layout:
 : The original onchain experiment, now operated only from `/admin`. The starter can only call `start()` once, ever. The starter can also call `resetTimer()` any number of times, but only while the experiment is alive — it can never revive one that has already ended, and it never touches press history. See [Contract rules](#contract-rules-admin-only-now).
 
 `web/api/`
-: The database-backed game regular visitors actually play. `_db.ts` (shared Postgres query helpers, schema types), `schema.sql` (the two-table schema — `game_state`, `presses`), `state.ts`/`press.ts`/`history.ts`/`stats.ts` (public, unauthenticated routes), `admin.ts` (start/reset, gated by `middleware.ts`'s Basic Auth). `_press.test.ts` runs real integration tests against this layer directly against Postgres — see [Testing](#testing).
+: The database-backed game regular visitors actually play. `_db.ts` (shared Postgres query helpers, schema types), `schema.sql` (the two-table schema — `game_state`, `presses`), `state.ts`/`press.ts`/`history.ts`/`stats.ts` (public, unauthenticated routes), `admin.ts` (start/reset/setTokenCA, gated by `middleware.ts`'s session-cookie login). `_press.test.ts` runs real integration tests against this layer directly against Postgres — see [Testing](#testing).
 
 `web/middleware.ts`
-: Vercel Edge Middleware gating `/admin` and `/api/admin` behind Basic Auth, checked before the SPA or the API route ever runs. See `SECURITY.md`.
+: Vercel Edge Middleware gating `/admin` and `/api/admin` behind a signed session cookie, checked before the SPA or the API route ever runs. Unauthenticated, `/admin` gets a themed login page (`web/api/_adminLoginPage.ts`) instead of the browser's own Basic Auth prompt. See `SECURITY.md`.
 
 `web/`
 : React + TypeScript + Vite frontend. Regular pages talk only to `web/api/*`; `/admin` additionally connects a wallet and reads/writes the smart contract directly via viem/wagmi.

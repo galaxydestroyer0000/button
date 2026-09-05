@@ -17,8 +17,13 @@ CREATE TABLE IF NOT EXISTS game_state (
   last_press_faction SMALLINT,
   last_press_remaining_seconds INTEGER,
   reset_count INTEGER NOT NULL DEFAULT 0,
+  token_ca TEXT,
   CHECK (id = 1)
 );
+
+-- Re-running this file against a database created before token_ca existed
+-- (CREATE TABLE IF NOT EXISTS above is a no-op there) still adds the column.
+ALTER TABLE game_state ADD COLUMN IF NOT EXISTS token_ca TEXT;
 
 INSERT INTO game_state (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 

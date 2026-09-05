@@ -23,6 +23,7 @@ export interface GameStateRow {
   last_press_faction: number | null;
   last_press_remaining_seconds: number | null;
   reset_count: number;
+  token_ca: string | null;
 }
 
 export interface PressRow {

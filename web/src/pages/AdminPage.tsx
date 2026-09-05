@@ -6,6 +6,7 @@ import { runtimeConfig } from "../config/runtimeConfig";
 import { txUrl } from "../config/network";
 import { explainRevert } from "../lib/explainRevert";
 import { useStarter } from "../hooks/useStarter";
+import { useGameState } from "../hooks/useGameState";
 import { usePageMeta } from "../lib/pageMeta";
 import type { ExperimentState } from "../domain/types";
 import styles from "./AdminPage.module.css";
@@ -312,6 +313,8 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
           <ScheduleControls scheduling={scheduling} />
         )}
       </div>
+
+      <TokenCAControls />
     </section>
   );
 }
@@ -400,6 +403,74 @@ function ScheduleControls({ scheduling }: { scheduling: Scheduling }) {
       <button type="button" disabled={!input} onClick={() => scheduling.arm(input)}>
         ARM
       </button>
+    </div>
+  );
+}
+
+/** Independent of the onchain start()/resetTimer() flow above — this just
+ *  writes game_state.token_ca via POST /api/admin's setTokenCA action, which
+ *  every page's CaBanner.tsx reads live. No redeploy, no wallet, no
+ *  transaction: it's a plain database value for a plain visibility feature. */
+function TokenCAControls() {
+  const { tokenCA, loaded } = useGameState();
+  const [input, setInput] = useState("");
+  const [initialized, setInitialized] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
+
+  useEffect(() => {
+    if (!initialized && loaded) {
+      setInput(tokenCA ?? "");
+      setInitialized(true);
+    }
+  }, [initialized, loaded, tokenCA]);
+
+  async function save() {
+    setSaving(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "setTokenCA", value: input.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus({ ok: false, message: data.message || data.error || "UNKNOWN ERROR" });
+        return;
+      }
+      setInput(data.tokenCA ?? "");
+      setStatus({
+        ok: true,
+        message: data.tokenCA ? "SAVED. LIVE ON THE SITE NOW." : 'CLEARED. THE BANNER READS "NOT LAUNCHED" AGAIN.'
+      });
+    } catch (error) {
+      setStatus({ ok: false, message: error instanceof Error ? error.message : "COULD NOT REACH THE SERVER" });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className={styles.scheduleCard}>
+      <h3>Token contract address</h3>
+      <p>
+        Shown in full, with a copy button, in the banner at the very top of every page. Leave it empty and the banner
+        reads "NOT LAUNCHED" instead. Takes effect immediately for every visitor, no redeploy.
+      </p>
+      <div className={styles.scheduleForm}>
+        <input
+          type="text"
+          className={styles.tokenCaInput}
+          placeholder="0x… (leave empty for NOT LAUNCHED)"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button type="button" disabled={saving} onClick={save}>
+          {saving ? "SAVING…" : "SAVE"}
+        </button>
+      </div>
+      {status && <p className={status.ok ? styles.tokenCaStatusOk : styles.disabledNotice}>{status.message}</p>}
     </div>
   );
 }

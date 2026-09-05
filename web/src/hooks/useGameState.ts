@@ -14,6 +14,7 @@ export interface GameState {
   lastPressFaction: number | null;
   lastPressRemainingSeconds: number | null;
   resetCount: number;
+  tokenCA: string | null;
   error: string | null;
 }
 
@@ -31,6 +32,7 @@ const INITIAL_STATE: GameState = {
   lastPressFaction: null,
   lastPressRemainingSeconds: null,
   resetCount: 0,
+  tokenCA: null,
   error: null
 };
 
@@ -63,6 +65,7 @@ export function useGameState(): GameState {
           lastPressFaction: data.lastPressFaction,
           lastPressRemainingSeconds: data.lastPressRemainingSeconds,
           resetCount: data.resetCount,
+          tokenCA: data.tokenCA,
           error: null
         });
       } catch (error) {

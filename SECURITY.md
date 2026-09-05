@@ -215,15 +215,21 @@ precise about what each one actually does:
   depend on anything described below.
 - **`web/middleware.ts` is a Vercel Edge Middleware gate in front of the route
   itself**, checked before the SPA is served at all — an unauthenticated request to
-  `/admin` gets a `401` and never receives `index.html` or any part of the JS
-  bundle. Credentials (`ADMIN_BASIC_AUTH_USER` / `ADMIN_BASIC_AUTH_PASSWORD`) are
-  read server-side only, from Vercel's own project environment variables — never
-  `VITE_`-prefixed, never shipped to the client. It fails closed: if either
-  variable is unset on a deployment, `/admin` returns `401` for everyone,
-  including the real starter, rather than silently falling open. The same matcher
-  and the same realm cover `POST /api/admin`, so a browser that already
-  authenticated to load `/admin` sends its cached credentials on that request too —
-  no separate login step, and no unauthenticated caller can reach it either.
+  `/admin` gets a `401` and a themed login page (`web/api/_adminLoginPage.ts`)
+  instead of `index.html` or any part of the JS bundle; `/api/admin` gets a plain
+  `401` JSON body. Login is `POST /api/admin-login` checking username/password
+  against `ADMIN_BASIC_AUTH_USER` / `ADMIN_BASIC_AUTH_PASSWORD` (unchanged names
+  from before this was a session cookie — still Vercel project environment
+  variables, never `VITE_`-prefixed, never shipped to the client), which on a
+  match issues a signed, httpOnly, 12-hour session cookie (`web/api/_adminSession.ts`
+  — HMAC-SHA256 over an expiry timestamp, keyed by `ADMIN_SESSION_SECRET`) that
+  the middleware verifies on every subsequent request instead of re-checking a
+  password. `POST /api/admin-logout` clears it. It fails closed: if
+  `ADMIN_SESSION_SECRET` is unset on a deployment, `/admin` and `/api/admin` return
+  `401` for everyone, including the real starter, rather than silently falling
+  open. The login/logout endpoints themselves are reachable without a session —
+  middleware's matcher only covers the exact paths `/admin` and `/api/admin`, not
+  `/api/admin-login` or `/api/admin-logout`.
 
 **How the two systems stay in sync (and what happens when they don't).** After a
 real onchain `start()`/`resetTimer()` transaction succeeds, `AdminPage.tsx` calls
@@ -246,21 +252,23 @@ top of the `401` most of them would get anyway.
 
 **Known limitations, stated plainly:**
 
-- The password comparison in `middleware.ts` is a plain string equality check, not
-  a constant-time comparison — a theoretical timing side-channel exists. Given the
-  actual security boundary is the contract's own check (above), and this is a
-  single low-value shared credential rather than a per-user login, that trade-off
-  was made deliberately rather than pulling in a timing-safe-compare dependency
-  for it.
+- The password comparison in `api/admin-login.ts` is a plain string equality
+  check, not a constant-time comparison — a theoretical timing side-channel
+  exists there. Given the actual security boundary is the contract's own check
+  (above), and this is a single low-value shared credential rather than a
+  per-user login, that trade-off was made deliberately rather than pulling in a
+  timing-safe-compare dependency for it. The session cookie itself doesn't have
+  this caveat — `middleware.ts` verifies its HMAC with `crypto.subtle.verify`,
+  which is constant-time by construction.
 - **`npm run dev` / `vite preview` do not run Vercel Middleware at all** — local
   admin access is exactly as open as it was before this existed. This only takes
   effect on an actual Vercel deployment. Verified with a direct unit test of the
   middleware's own auth logic (`web/middleware.test.ts` — fails closed with no
-  credentials configured, rejects a missing/wrong/malformed `Authorization`
-  header, accepts exactly the configured credentials) rather than end-to-end
-  against a real deployment, since that would require linking this project to a
-  Vercel account from this environment — deliberately not attempted without the
-  operator's explicit go-ahead.
+  session secret configured, rejects a missing/expired/malformed/wrong-secret
+  session cookie, accepts exactly a validly signed one) rather than end-to-end
+  against a real deployment during automated tests; the actual deployed behavior
+  (themed login page, cookie issuance, authenticated pass-through, logout) was
+  separately verified by hand against the real production deployment.
 
 ## The database-backed game
 
@@ -271,9 +279,10 @@ regular presses no longer touch.
 **What it is:** a Postgres database (provisioned via Vercel's Neon integration),
 queried through a handful of Vercel Functions (`web/api/`): `state.ts` (read the
 shared countdown/totals), `press.ts` (submit a press), `history.ts`/`stats.ts`
-(read past presses and aggregates), `admin.ts` (start/reset, gated as described
-above). Schema in `web/api/schema.sql`: a single-row `game_state` table (started,
-deadline, totals, closest call) and a `presses` table (one row per successful
+(read past presses and aggregates), `admin.ts` (start/reset/setTokenCA, gated as
+described above). Schema in `web/api/schema.sql`: a single-row `game_state` table
+(started, deadline, totals, closest call, the operator-set token contract address
+shown in the site-wide CA banner) and a `presses` table (one row per successful
 press, keyed by username).
 
 **What it enforces, for real:**

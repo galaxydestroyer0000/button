@@ -70,6 +70,8 @@
   padding: 10px 12px;
   font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+.tokenCaInput { flex: 1; min-width: 260px; }
+.tokenCaStatusOk { margin-top: 12px; color: #7fd88f; font-size: 12px; }
 .scheduleForm button, .armed button {
   border: 1px solid #3a3a3a;
   background: #171717;

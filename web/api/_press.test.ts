@@ -62,12 +62,12 @@ describe.skipIf(!hasDatabase)("database-backed game API (real Neon database)", (
     // Start from a genuinely sealed state — these tests own the shared
     // game_state row for their duration, same assumption admin.spec.ts makes
     // about the chain-side contract.
-    await sql`UPDATE game_state SET started=false, started_at=NULL, deadline=NULL, total_presses=0, closest_call_seconds=NULL, closest_call_username=NULL, last_presser_username=NULL, last_press_faction=NULL, last_press_remaining_seconds=NULL, reset_count=0 WHERE id=1`;
+    await sql`UPDATE game_state SET started=false, started_at=NULL, deadline=NULL, total_presses=0, closest_call_seconds=NULL, closest_call_username=NULL, last_presser_username=NULL, last_press_faction=NULL, last_press_remaining_seconds=NULL, reset_count=0, token_ca=NULL WHERE id=1`;
   });
 
   afterAll(async () => {
     await sql`DELETE FROM presses WHERE username_lower LIKE ${TEST_PREFIX + "%"}`;
-    await sql`UPDATE game_state SET started=false, started_at=NULL, deadline=NULL, total_presses=0, closest_call_seconds=NULL, closest_call_username=NULL, last_presser_username=NULL, last_press_faction=NULL, last_press_remaining_seconds=NULL, reset_count=0 WHERE id=1`;
+    await sql`UPDATE game_state SET started=false, started_at=NULL, deadline=NULL, total_presses=0, closest_call_seconds=NULL, closest_call_username=NULL, last_presser_username=NULL, last_press_faction=NULL, last_press_remaining_seconds=NULL, reset_count=0, token_ca=NULL WHERE id=1`;
   });
 
   it("rejects a press before the game has started", async () => {
@@ -126,6 +126,26 @@ describe.skipIf(!hasDatabase)("database-backed game API (real Neon database)", (
     await press(mockReq("POST", { username: testUsername("too_late") }), pressAfterDeath);
     expect(pressAfterDeath.statusCode).toBe(409);
     expect((pressAfterDeath.body as { error: string }).error).toBe("ENDED");
+  });
+
+  it("sets, updates, and clears the token contract address", async () => {
+    const set = mockRes();
+    await admin(mockReq("POST", { action: "setTokenCA", value: "0xTestTokenAddress" }), set);
+    expect(set.statusCode).toBe(200);
+    expect((set.body as { tokenCA: string }).tokenCA).toBe("0xTestTokenAddress");
+
+    const afterSet = mockRes();
+    await state(mockReq("GET"), afterSet);
+    expect((afterSet.body as { tokenCA: string | null }).tokenCA).toBe("0xTestTokenAddress");
+
+    const cleared = mockRes();
+    await admin(mockReq("POST", { action: "setTokenCA", value: "  " }), cleared);
+    expect(cleared.statusCode).toBe(200);
+    expect((cleared.body as { tokenCA: string | null }).tokenCA).toBeNull();
+
+    const afterClear = mockRes();
+    await state(mockReq("GET"), afterClear);
+    expect((afterClear.body as { tokenCA: string | null }).tokenCA).toBeNull();
   });
 
   it("state reflects everything the above did", async () => {
