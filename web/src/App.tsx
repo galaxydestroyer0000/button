@@ -15,7 +15,6 @@ const HistoryPage = lazy(() => import("./pages/HistoryPage"));
 const StatsPage = lazy(() => import("./pages/StatsPage"));
 const PressPage = lazy(() => import("./pages/PressPage"));
 const WalletPage = lazy(() => import("./pages/WalletPage"));
-const ProofPage = lazy(() => import("./pages/ProofPage"));
 // Deliberately unlinked from nav (see the "Admin page location" decision) — the
 // contract itself is the real access control, this route is just not advertised.
 const AdminPage = lazy(() => import("./pages/AdminPage"));
@@ -79,14 +78,6 @@ export default function App() {
           element={
             <Suspense fallback={<RouteLoading />}>
               <WalletPage />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/proof"
-          element={
-            <Suspense fallback={<RouteLoading />}>
-              <ProofPage />
             </Suspense>
           }
         />

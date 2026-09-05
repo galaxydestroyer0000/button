@@ -18,11 +18,12 @@ interface ButtonConfig {
    */
   rpcUrl: string;
   /** The deployment transaction hash, recorded by the operator after a real
-   *  deployment (see scripts/deploy.sh's output / contracts/broadcast/). Optional —
-   *  the /proof page shows "not yet recorded" rather than inventing one when unset. */
+   *  deployment (see scripts/deploy.sh's output / contracts/broadcast/). Optional,
+   *  currently unused by any page — kept for parity with VITE_DEPLOY_TX/
+   *  scripts/configure.mjs until something reads it again. */
   deployTx: string;
   /** The activation (`start()`) transaction hash, recorded by the operator after
-   *  running scripts/start.sh. Optional, same fallback behavior as deployTx. */
+   *  running scripts/start.sh. Optional, same status as deployTx. */
   startTx: string;
 }
 

@@ -119,7 +119,6 @@ export default function TopBar() {
           </NavLink>
           <NavLink to="/history">History</NavLink>
           <NavLink to="/stats">Stats</NavLink>
-          <NavLink to="/proof">Proof</NavLink>
         </nav>
         <div className={styles.actions}>
           <button type="button" className={styles.soundBtn} aria-pressed={soundOn} onClick={toggleSound}>

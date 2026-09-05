@@ -9,7 +9,6 @@ BUTTON is a minimal, permanently unmodifiable smart contract (no admin reset, pa
 - [Experiment](/): the live countdown, press button, and current shared state
 - [History](/history): every press ever recorded, filterable by wallet, faction, and press number
 - [Stats](/stats): aggregate onchain statistics — total presses, faction distribution, closest calls
-- [Proof](/proof): contract address, deployment/verification details, and reproducible verification instructions
 
 ## Rules
 

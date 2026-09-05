@@ -246,7 +246,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         </div>
         <div>
           <span>TIMER RESETS USED SO FAR</span>
-          <code>{state.loaded ? "see resetTimer() events on /proof" : "N/A"}</code>
+          <code>{state.loaded ? "see resetTimer() events on the contract's block explorer page" : "N/A"}</code>
         </div>
       </div>
 

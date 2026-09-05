@@ -26,7 +26,7 @@ Ahead of a real mainnet deployment, the operator concluded that asking visitors 
 
 - **Presses are no longer independently verifiable.** They live in a private Postgres database the operator controls directly. There is no public ledger, no cryptographic signature per press, and no way for a visitor to check a specific press against a source they don't have to trust.
 - **"One press, forever" no longer has Sybil resistance.** A username is free to create and free to re-create — the server permanently enforces "one press per username," but nothing stops one person from using several usernames. A funded wallet with history was never proof-of-personhood either, but it was at least a real, non-free resource; a username is not.
-- **What's still true:** the deployed contract, its verified source, and the operator's own `start()`/`resetTimer()` calls against it remain 100% real and independently checkable — they're just disconnected from what a regular visitor experiences. See `/proof` on the live site for the full, current honest breakdown, and `SECURITY.md` for the complete trust-assumption writeup, including a known, currently-unmitigated abuse vector (no rate limiting on the public press endpoint) that a real mainnet launch needs to address first.
+- **What's still true:** the deployed contract, its verified source, and the operator's own `start()`/`resetTimer()` calls against it remain 100% real and independently checkable — they're just disconnected from what a regular visitor experiences. See `SECURITY.md` for the complete trust-assumption writeup, including a known, currently-unmitigated abuse vector (no rate limiting on the public press endpoint) that a real mainnet launch needs to address first.
 
 ## How the experiment works
 
@@ -236,7 +236,7 @@ Uses Robinhood Chain's own documented Blockscout verifier settings. Confirm the 
 export VITE_RH_NETWORK=testnet
 export VITE_BUTTON_CONTRACT=0xYOUR_DEPLOYED_ADDRESS
 export VITE_CONTRACT_DEPLOY_BLOCK=123456
-export VITE_DEPLOY_TX=0xYOUR_DEPLOY_TX_HASH      # optional — shown on /proof
+export VITE_DEPLOY_TX=0xYOUR_DEPLOY_TX_HASH      # optional, currently unused by any page
 export VITE_BUTTON_TOKEN=0xOPTIONAL_BUTTON_TOKEN
 export VITE_TOKEN_URL='https://your-token-page.example'
 export VITE_PAIR_LABEL='BUTTON / RDDT'
@@ -264,7 +264,7 @@ Walks sealed → start → first press → second wallet press (countdown reset)
 
 ```bash
 export BUTTON_CONTRACT=0xYOUR_DEPLOYED_ADDRESS
-export VITE_START_TX=...       # fill in after, for /proof — see step 3
+export VITE_START_TX=...       # optional, currently unused by any page — see step 3
 ./scripts/start.sh testnet     # or: mainnet
 ```
 
@@ -274,7 +274,7 @@ See [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) for the complete pre-activation
 
 ### Hosting
 
-This is no longer a pure static site — `web/api/*` needs a real Vercel Functions runtime and a Postgres connection (`DATABASE_URL`), so it deploys to Vercel specifically, not an arbitrary static host. The app is client-side routed (`/`, `/history`, `/stats`, `/proof`, `/press/:number`, `/wallet/:address`, `/admin`), so `web/vercel.json`'s SPA rewrite still matters for any path that isn't a real static file or an API route.
+This is no longer a pure static site — `web/api/*` needs a real Vercel Functions runtime and a Postgres connection (`DATABASE_URL`), so it deploys to Vercel specifically, not an arbitrary static host. The app is client-side routed (`/`, `/history`, `/stats`, `/press/:number`, `/wallet/:address`, `/admin`), so `web/vercel.json`'s SPA rewrite still matters for any path that isn't a real static file or an API route.
 
 ## Verification
 
