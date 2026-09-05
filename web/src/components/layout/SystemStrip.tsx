@@ -15,10 +15,10 @@ export default function SystemStrip({ state }: { state: ExperimentState }) {
 
   return (
     <footer className={styles.strip}>
-      <span>CHAIN <code>{runtimeConfig.previewMode ? "—" : runtimeConfig.network.name.toUpperCase()}</code></span>
-      <span>DEPLOY BLOCK <code>{runtimeConfig.raw.contractDeployBlock || "—"}</code></span>
-      <span>LATEST BLOCK <code>{runtimeConfig.previewMode ? "—" : state.currentBlock || "—"}</code></span>
-      <span>UNIQUE PARTICIPANTS <code>{runtimeConfig.previewMode ? "—" : state.totalPresses.toLocaleString()}</code></span>
+      <span>CHAIN <code>{runtimeConfig.previewMode ? "N/A" : runtimeConfig.network.name.toUpperCase()}</code></span>
+      <span>DEPLOY BLOCK <code>{runtimeConfig.raw.contractDeployBlock || "N/A"}</code></span>
+      <span>LATEST BLOCK <code>{runtimeConfig.previewMode ? "N/A" : state.currentBlock || "N/A"}</code></span>
+      <span>UNIQUE PARTICIPANTS <code>{runtimeConfig.previewMode ? "N/A" : state.totalPresses.toLocaleString()}</code></span>
       <span>STATE <code>{experimentStateLabel}</code></span>
     </footer>
   );

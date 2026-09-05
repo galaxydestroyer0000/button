@@ -35,15 +35,15 @@ export default function StatsPanel({
       <div className={styles.grid}>
         <StatTile
           label="TOTAL PRESSES"
-          value={runtimeConfig.previewMode ? total.toLocaleString() : state.loaded ? total.toLocaleString() : "—"}
+          value={runtimeConfig.previewMode ? total.toLocaleString() : state.loaded ? total.toLocaleString() : "N/A"}
           caption="one wallet = one press"
         />
-        <StatTile label="EXPERIMENT UPTIME" value={Number.isFinite(ageSeconds) ? formatDuration(ageSeconds) : "—"} caption="since activation" />
-        <StatTile label="CLOSEST CALL" value={total ? `${closest}s` : "—"} caption="lowest clock at press" />
-        <StatTile label="CURRENT STREAK" value={streak ? String(streak) : "—"} caption="consecutive same-faction presses" />
+        <StatTile label="EXPERIMENT UPTIME" value={Number.isFinite(ageSeconds) ? formatDuration(ageSeconds) : "N/A"} caption="since activation" />
+        <StatTile label="CLOSEST CALL" value={total ? `${closest}s` : "N/A"} caption="lowest clock at press" />
+        <StatTile label="CURRENT STREAK" value={streak ? String(streak) : "N/A"} caption="consecutive same-faction presses" />
       </div>
       <div className={styles.latest}>
-        <StatTile label="LATEST PRESSER" value={latestPresser ? shortAddress(latestPresser) : "—"} caption="most recent wallet" />
+        <StatTile label="LATEST PRESSER" value={latestPresser ? shortAddress(latestPresser) : "N/A"} caption="most recent wallet" />
       </div>
       <FactionBars counts={counts} total={total} pulseEvent={pulseEvent} />
     </section>

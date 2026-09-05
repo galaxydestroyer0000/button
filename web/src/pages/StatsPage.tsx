@@ -44,30 +44,30 @@ export default function StatsPage() {
       <div className={styles.head}>
         <span className={styles.eyebrow}>STATS</span>
         <h2>Every number here is read from the database.</h2>
-        <p>No invented volume, user counts, or market metrics — only what the server's own records can prove.</p>
+        <p>No invented volume, user counts, or market metrics. Only what the server's own records can prove.</p>
       </div>
 
       <div className={styles.grid}>
-        <StatTile label="TOTAL PRESSES" value={stats.loaded ? stats.totalPresses.toLocaleString() : "—"} caption="every successful press, ever" />
+        <StatTile label="TOTAL PRESSES" value={stats.loaded ? stats.totalPresses.toLocaleString() : "N/A"} caption="every successful press, ever" />
         <StatTile
           label="UNIQUE PRESSERS"
-          value={stats.loaded ? stats.totalPresses.toLocaleString() : "—"}
+          value={stats.loaded ? stats.totalPresses.toLocaleString() : "N/A"}
           caption="one username = one press, always equal to total presses"
         />
         <StatTile
           label="CLOSEST CALL EVER"
-          value={stats.totalPresses ? `${stats.closestCallSeconds}s` : "—"}
+          value={stats.totalPresses ? `${stats.closestCallSeconds}s` : "N/A"}
           caption={stats.closestCallUsername || "lowest clock at press"}
         />
         <StatTile
           label="MOST RECENT PRESS"
-          value={latest ? `${latest.remaining}s — ${latestFaction!.name}` : "—"}
+          value={latest ? `${latest.remaining}s · ${latestFaction!.name}` : "N/A"}
           caption={latest ? latest.presser : "no presses yet"}
         />
-        <StatTile label="EXPERIMENT UPTIME" value={stats.uptimeSeconds != null ? formatDuration(stats.uptimeSeconds) : "—"} caption="since activation" />
+        <StatTile label="EXPERIMENT UPTIME" value={stats.uptimeSeconds != null ? formatDuration(stats.uptimeSeconds) : "N/A"} caption="since activation" />
         <StatTile label="CURRENT COUNTDOWN" value={reading.label} caption="interpolated locally, resynced from the server" />
-        <StatTile label="PRESSES · LAST HOUR" value={eventsLoaded ? counts.lastHour.toLocaleString() : "—"} caption="from the database" />
-        <StatTile label="PRESSES · LAST 24H" value={eventsLoaded ? counts.last24h.toLocaleString() : "—"} caption="from the database" />
+        <StatTile label="PRESSES · LAST HOUR" value={eventsLoaded ? counts.lastHour.toLocaleString() : "N/A"} caption="from the database" />
+        <StatTile label="PRESSES · LAST 24H" value={eventsLoaded ? counts.last24h.toLocaleString() : "N/A"} caption="from the database" />
       </div>
 
       <div className={styles.sectionGap}>
@@ -94,9 +94,9 @@ export default function StatsPage() {
       </div>
 
       <div className={styles.sectionGap}>
-        <span className={styles.eyebrow}>LEGENDARY — CLOSEST POSSIBLE CALLS</span>
+        <span className={styles.eyebrow}>LEGENDARY: CLOSEST POSSIBLE CALLS</span>
         <p className={styles.sectionNote}>
-          Remaining is a whole second, and 0 is unreachable — pressing exactly at the deadline reverts. {LEGENDARY_MAX_SECONDS}s or less is
+          Remaining is a whole second, and 0 is unreachable. Pressing exactly at the deadline reverts. {LEGENDARY_MAX_SECONDS}s or less is
           as close as anyone can ever get.
         </p>
         <div className={styles.spacer} />

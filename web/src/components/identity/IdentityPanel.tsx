@@ -22,11 +22,11 @@ export default function IdentityPanel({ preview, userPress }: { preview: Preview
     <div className={styles.panel} aria-label="Your identity">
       <div>
         <span>WALLET</span>
-        <strong>{address ? shortAddress(address) : runtimeConfig.previewMode ? "PREVIEW" : "—"}</strong>
+        <strong>{address ? shortAddress(address) : runtimeConfig.previewMode ? "PREVIEW" : "N/A"}</strong>
       </div>
       <div>
         <span>PRESSED AT</span>
-        <strong>{hasPressed ? `${remaining}s` : "—"}</strong>
+        <strong>{hasPressed ? `${remaining}s` : "N/A"}</strong>
       </div>
       <div>
         <span>FACTION</span>

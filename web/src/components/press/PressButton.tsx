@@ -5,7 +5,7 @@ export default function PressButton({ label, disabled, onPress }: { label: strin
     <div className={styles.stage}>
       <div className={styles.dial} aria-hidden="true" />
       <div className={styles.plinth}>
-        <button type="button" className={styles.button} disabled={disabled} onClick={onPress} aria-label={`${label} — press the button once, forever`}>
+        <button type="button" className={styles.button} disabled={disabled} onClick={onPress} aria-label={`${label}: press the button once, forever`}>
           <span className={styles.glare} />
           <span className={styles.copy}>{label}</span>
         </button>

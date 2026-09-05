@@ -20,7 +20,7 @@ export default function PressPage({ state, sync }: { state: ExperimentState; syn
   usePageMeta(
     lookup.status === "found" && lookup.event
       ? {
-          title: `Press #${lookup.event.pressNumber.toLocaleString()} — ${foundFaction?.name}, ${lookup.event.remaining}s`,
+          title: `Press #${lookup.event.pressNumber.toLocaleString()} · ${foundFaction?.name}, ${lookup.event.remaining}s`,
           description: `${shortAddress(lookup.event.presser)} pressed BUTTON at ${lookup.event.remaining} seconds. ${foundFaction?.name}. One press forever.`
         }
       : null

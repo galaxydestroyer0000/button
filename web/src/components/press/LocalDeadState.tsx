@@ -26,7 +26,7 @@ export default function LocalDeadState({ state }: { state: GameState }) {
       <div className={styles.facts}>
         <div>
           <span>FINAL PRESS</span>
-          <strong>{totalPresses ? `#${totalPresses.toLocaleString()}` : "—"}</strong>
+          <strong>{totalPresses ? `#${totalPresses.toLocaleString()}` : "N/A"}</strong>
         </div>
         <div>
           <span>FINAL PRESSER</span>
@@ -43,8 +43,8 @@ export default function LocalDeadState({ state }: { state: GameState }) {
         <div>
           <span>CLOSEST CALL</span>
           <strong>
-            {totalPresses ? `${state.closestCallSeconds}s` : "—"}
-            {state.closestCallUsername ? ` — ${state.closestCallUsername}` : ""}
+            {totalPresses ? `${state.closestCallSeconds}s` : "N/A"}
+            {state.closestCallUsername ? ` by ${state.closestCallUsername}` : ""}
           </strong>
         </div>
         {state.lastPressFaction != null && (

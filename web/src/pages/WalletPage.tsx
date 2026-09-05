@@ -16,7 +16,7 @@ export default function WalletPage() {
   usePageMeta(
     walletFaction
       ? {
-          title: `${shortAddress(address)} — ${walletFaction.name}`,
+          title: `${shortAddress(address)} · ${walletFaction.name}`,
           description: `${shortAddress(address)} pressed BUTTON at ${lookup.remaining} seconds. ${walletFaction.name}. One press forever.`
         }
       : null
@@ -51,7 +51,7 @@ export default function WalletPage() {
       <section className={styles.section}>
         <div className={styles.head}>
           <span className={styles.eyebrow}>{address}</span>
-          <h2>{FACTIONS[0].name} — {FACTIONS[0].seed}.</h2>
+          <h2>{FACTIONS[0].name} · {FACTIONS[0].seed}.</h2>
         </div>
         <div className={styles.notice}>THIS WALLET HAS NOT PRESSED. ITS ONE PRESS IS STILL UNSPENT.</div>
       </section>

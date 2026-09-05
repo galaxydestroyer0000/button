@@ -63,7 +63,7 @@ export default function PressStage() {
       ? `DEADLINE · ${new Date(state.deadlineMs).toLocaleTimeString([], { hour12: false })}`
       : state.deadlineMs
         ? `ENDED · ${new Date(state.deadlineMs).toLocaleString()}`
-        : "—";
+        : "N/A";
 
   const statusLabel = !state.loaded
     ? state.error || "LOADING SHARED STATE"

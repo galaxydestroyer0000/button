@@ -11,11 +11,11 @@ import type { ExperimentState } from "../domain/types";
 import styles from "./AdminPage.module.css";
 
 const START_REASONS: Record<string, string> = {
-  AlreadyStarted: "THE EXPERIMENT HAS ALREADY BEEN ACTIVATED — start() CAN NEVER BE CALLED AGAIN",
+  AlreadyStarted: "THE EXPERIMENT HAS ALREADY BEEN ACTIVATED. start() CAN NEVER BE CALLED AGAIN",
   OnlyStarter: "THIS WALLET IS NOT THE STARTER ADDRESS"
 };
 const RESET_REASONS: Record<string, string> = {
-  ExperimentNotAlive: "THE EXPERIMENT IS NOT CURRENTLY ALIVE — resetTimer() ONLY WORKS BEFORE THE DEADLINE PASSES, NEVER AFTER",
+  ExperimentNotAlive: "THE EXPERIMENT IS NOT CURRENTLY ALIVE. resetTimer() ONLY WORKS BEFORE THE DEADLINE PASSES, NEVER AFTER",
   OnlyStarter: "THIS WALLET IS NOT THE STARTER ADDRESS"
 };
 
@@ -27,7 +27,7 @@ const SCHEDULE_STORAGE_KEY = "button-admin-scheduled-start";
  *  keep a wrong-wallet visitor from wasting gas on a call the contract will
  *  reject anyway, and to make the two admin actions safe and legible to use. */
 export default function AdminPage({ state }: { state: ExperimentState }) {
-  usePageMeta({ title: "Admin", description: "Operator controls for ButtonExperiment — start the clock, or reset it while alive." });
+  usePageMeta({ title: "Admin", description: "Operator controls for ButtonExperiment: start the clock, or reset it while alive." });
 
   const { address, isConnected, chainId } = useAccount();
   const publicClient = usePublicClient({ chainId: runtimeConfig.network.chainId });
@@ -112,7 +112,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         );
       } else {
         setTxStatus(
-          `ONCHAIN ${action === "start" ? "ACTIVATION" : "RESET"} SUCCEEDED, BUT THE DATABASE GAME DID NOT SYNC — USE RETRY BELOW.`
+          `ONCHAIN ${action === "start" ? "ACTIVATION" : "RESET"} SUCCEEDED, BUT THE DATABASE GAME DID NOT SYNC. USE RETRY BELOW.`
         );
       }
     },
@@ -204,7 +204,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         <span className={styles.eyebrow}>ADMIN</span>
         <h2>Operator controls.</h2>
         <p className={styles.lede}>
-          This page has no special access to the contract — everything here is a plain transaction that the contract itself accepts
+          This page has no special access to the contract. Everything here is a plain transaction that the contract itself accepts
           only from the real starter wallet and rejects from anyone else. It exists to make two narrow, publicly-visible admin
           actions safe to use, not to add a hidden capability.
         </p>
@@ -221,7 +221,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         </div>
         <div>
           <span>ACCESS</span>
-          <code>{!isConnected ? "CONNECT YOUR WALLET ABOVE" : !starterLoaded ? "READING…" : isStarter ? "GRANTED" : "DENIED — WRONG WALLET"}</code>
+          <code>{!isConnected ? "CONNECT YOUR WALLET ABOVE" : !starterLoaded ? "READING…" : isStarter ? "GRANTED" : "DENIED: WRONG WALLET"}</code>
         </div>
         <div>
           <span>EXPERIMENT STATE</span>
@@ -229,17 +229,17 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         </div>
         <div>
           <span>DEADLINE</span>
-          <code>{state.loaded && state.started ? new Date(state.deadline * 1000).toLocaleString() : "—"}</code>
+          <code>{state.loaded && state.started ? new Date(state.deadline * 1000).toLocaleString() : "N/A"}</code>
         </div>
         <div>
           <span>TIMER RESETS USED SO FAR</span>
-          <code>{state.loaded ? "see resetTimer() events on /proof" : "—"}</code>
+          <code>{state.loaded ? "see resetTimer() events on /proof" : "N/A"}</code>
         </div>
       </div>
 
       <div className={styles.actions}>
         <div className={styles.actionCard}>
-          <h3>Activate — one time, ever</h3>
+          <h3>Activate: one time, ever</h3>
           <p>Calls start(). Only works once, only for the starter wallet, only while the experiment is sealed.</p>
           <button
             type="button"
@@ -251,8 +251,8 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         </div>
 
         <div className={styles.actionCard}>
-          <h3>Reset timer — while alive only</h3>
-          <p>Calls resetTimer(). Pushes the deadline back to a fresh 60 seconds. Reverts if not started yet or already ended — can never revive a dead experiment.</p>
+          <h3>Reset timer: while alive only</h3>
+          <p>Calls resetTimer(). Pushes the deadline back to a fresh 60 seconds. Reverts if not started yet or already ended. Can never revive a dead experiment.</p>
           <button
             type="button"
             disabled={!isStarter || !state.started || !state.alive || pendingAction !== null}
@@ -286,7 +286,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
       <div className={styles.scheduleCard}>
         <h3>Scheduled activation</h3>
         <p>
-          Picks a future time and fires start() automatically once it arrives — <strong>while this exact browser tab stays open and
+          Picks a future time and fires start() automatically once it arrives, <strong>while this exact browser tab stays open and
           your wallet stays connected</strong>. Closing the tab, losing wallet connection, or your computer sleeping will silently
           miss the moment; nothing runs on a server for this. Reopening this page re-arms the same schedule (it's saved locally),
           but only if you're back before the scheduled time.
@@ -294,7 +294,7 @@ export default function AdminPage({ state }: { state: ExperimentState }) {
         {!isStarter ? (
           <p className={styles.disabledNotice}>Connect the starter wallet to arm a scheduled start.</p>
         ) : state.started ? (
-          <p className={styles.disabledNotice}>Already activated — there's nothing left to schedule.</p>
+          <p className={styles.disabledNotice}>Already activated. There's nothing left to schedule.</p>
         ) : (
           <ScheduleControls scheduling={scheduling} />
         )}

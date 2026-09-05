@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-const DEFAULT_TITLE = "BUTTON / RDDT — One press forever";
-const DEFAULT_DESCRIPTION = "A shared 60-second clock on Robinhood Chain. One wallet gets one press, ever. At zero, it ends forever.";
+const DEFAULT_TITLE = "BUTTON / RDDT: One press forever";
+const DEFAULT_DESCRIPTION = "A shared 60-second clock. One username gets one press, ever. At zero, it ends forever.";
 
 function setMeta(selector: string, attr: "content", value: string) {
   const el = document.head.querySelector(selector);
@@ -24,8 +24,8 @@ export function usePageMeta(meta: { title?: string; description?: string; image?
     const image = meta?.image ?? "/assets/button-token.webp";
 
     document.title = title;
-    setMeta('meta[property="og:title"]', "content", meta?.title ?? "BUTTON — one wallet, one press, forever");
-    setMeta('meta[name="twitter:title"]', "content", meta?.title ?? "BUTTON — one wallet, one press, forever");
+    setMeta('meta[property="og:title"]', "content", meta?.title ?? "BUTTON: one username, one press, forever");
+    setMeta('meta[name="twitter:title"]', "content", meta?.title ?? "BUTTON: one username, one press, forever");
     setMeta('meta[property="og:description"]', "content", description);
     setMeta('meta[name="twitter:description"]', "content", description);
     setMeta('meta[property="og:image"]', "content", image);
@@ -33,8 +33,8 @@ export function usePageMeta(meta: { title?: string; description?: string; image?
 
     return () => {
       document.title = DEFAULT_TITLE;
-      setMeta('meta[property="og:title"]', "content", "BUTTON — one wallet, one press, forever");
-      setMeta('meta[name="twitter:title"]', "content", "BUTTON — one wallet, one press, forever");
+      setMeta('meta[property="og:title"]', "content", "BUTTON: one username, one press, forever");
+      setMeta('meta[name="twitter:title"]', "content", "BUTTON: one username, one press, forever");
       setMeta('meta[property="og:description"]', "content", DEFAULT_DESCRIPTION);
       setMeta('meta[name="twitter:description"]', "content", DEFAULT_DESCRIPTION);
       setMeta('meta[property="og:image"]', "content", "/assets/button-token.webp");

@@ -1,10 +1,10 @@
 export function shortAddress(value: string | undefined | null): string {
-  if (!value || value.length < 10) return "—";
+  if (!value || value.length < 10) return "N/A";
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
 export function formatDuration(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) return "—";
+  if (!Number.isFinite(seconds) || seconds < 0) return "N/A";
   const d = Math.floor(seconds / 86400);
   const h = Math.floor((seconds % 86400) / 3600);
   const m = Math.floor((seconds % 3600) / 60);

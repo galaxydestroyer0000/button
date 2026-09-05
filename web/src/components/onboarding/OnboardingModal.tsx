@@ -27,17 +27,17 @@ export default function OnboardingModal({ onComplete }: { onComplete: (username:
         <div className={styles.lore}>
           <p>
             In 2015, Reddit put a button on the internet with a 60-second timer. Press it, and the timer resets to 60 for
-            everyone. Let it hit zero, and it's over — permanently. Over a million people turned that into factions,
+            everyone. Let it hit zero, and it's over for good. Over a million people turned that into factions,
             rituals, and genuine panic in the final seconds.
           </p>
           <p>
             <strong>BUTTON</strong> brings the same idea back, with the same two rules: <strong>you get exactly one
-            press, ever</strong>, and <strong>at zero, it ends — for good.</strong> No restart, no admin override, no
+            press, ever</strong>, and <strong>at zero, it ends for good.</strong> No restart, no admin override, no
             second chance.
           </p>
           <p>
             Your faction is decided by how much time was left when you pressed. Press immediately after a reset and
-            you're <strong>PURPLE</strong>. Wait until the last few seconds and you're <strong>RED</strong> — the
+            you're <strong>PURPLE</strong>. Wait until the last few seconds and you're <strong>RED</strong>, the
             faction that risked it closest to death.
           </p>
         </div>
@@ -57,10 +57,10 @@ export default function OnboardingModal({ onComplete }: { onComplete: (username:
           {touched && !valid ? (
             <div className={styles.error}>3–20 characters. Letters, numbers, and underscores only.</div>
           ) : (
-            <div className={styles.hint}>This is what gets recorded when you press. Choose carefully — it's permanent, once used.</div>
+            <div className={styles.hint}>This is what gets recorded when you press. Choose carefully. It's permanent once used.</div>
           )}
           <button type="button" className={styles.continue} onClick={submit} disabled={touched && !valid}>
-            I understand — let me in
+            I understand, let me in
           </button>
         </div>
       </div>

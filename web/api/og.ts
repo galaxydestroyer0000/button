@@ -86,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         client.readContract({ address: contractAddress, abi: buttonExperimentAbi, functionName: "pressRemaining", args: [address as `0x${string}`] })
       ]);
 
-      const title = hasPressed ? `${shortAddress(address)} — ${FACTIONS[Number(faction)]?.name}` : `${shortAddress(address)} — hasn't pressed`;
+      const title = hasPressed ? `${shortAddress(address)} · ${FACTIONS[Number(faction)]?.name}` : `${shortAddress(address)} · hasn't pressed`;
       const description = hasPressed
         ? `${shortAddress(address)} pressed BUTTON at ${remaining} seconds. ${FACTIONS[Number(faction)]?.name}. One press forever.`
         : "This wallet's one press is still unspent.";
@@ -118,7 +118,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const title = found
-        ? `Press #${pressNumber.toLocaleString()} — ${FACTIONS[found.faction]?.name}, ${found.remaining}s`
+        ? `Press #${pressNumber.toLocaleString()} · ${FACTIONS[found.faction]?.name}, ${found.remaining}s`
         : `Press #${pressNumber.toLocaleString()}`;
       const description = found
         ? `${shortAddress(found.presser)} pressed BUTTON at ${found.remaining} seconds. ${FACTIONS[found.faction]?.name}. One press forever.`

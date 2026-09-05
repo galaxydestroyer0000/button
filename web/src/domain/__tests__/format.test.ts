@@ -7,10 +7,10 @@ describe("shortAddress", () => {
   });
 
   it("never throws on hostile/malformed input — null, undefined, empty, short garbage", () => {
-    expect(shortAddress(null)).toBe("—");
-    expect(shortAddress(undefined)).toBe("—");
-    expect(shortAddress("")).toBe("—");
-    expect(shortAddress("0x1")).toBe("—");
+    expect(shortAddress(null)).toBe("N/A");
+    expect(shortAddress(undefined)).toBe("N/A");
+    expect(shortAddress("")).toBe("N/A");
+    expect(shortAddress("0x1")).toBe("N/A");
     // Long non-address garbage is truncated like any other string rather than
     // thrown on — this helper only formats, validation happens elsewhere.
     expect(() => shortAddress("not-an-address-but-long-enough")).not.toThrow();
@@ -27,9 +27,9 @@ describe("formatDuration", () => {
   });
 
   it("never throws on hostile input — negative, NaN, Infinity", () => {
-    expect(formatDuration(-5)).toBe("—");
-    expect(formatDuration(NaN)).toBe("—");
-    expect(formatDuration(Infinity)).toBe("—");
+    expect(formatDuration(-5)).toBe("N/A");
+    expect(formatDuration(NaN)).toBe("N/A");
+    expect(formatDuration(Infinity)).toBe("N/A");
   });
 });
 

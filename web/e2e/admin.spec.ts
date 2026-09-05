@@ -143,7 +143,7 @@ test.describe("admin page: start() and resetTimer()", () => {
     await page.goto("/admin");
     await page.getByRole("button", { name: /connect wallet/i }).click();
 
-    await expect(page.getByText("DENIED — WRONG WALLET")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("DENIED: WRONG WALLET")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("button", { name: "START THE EXPERIMENT" })).toBeDisabled();
   });
 

@@ -45,7 +45,7 @@ function drawIdentityCard(ctx: CanvasRenderingContext2D, data: IdentityCardData)
 
   ctx.fillStyle = "#5f5c57";
   ctx.font = "700 20px ui-monospace, Menlo, monospace";
-  ctx.fillText("BUTTON / RDDT — ONE PRESS FOREVER", 80, HEIGHT - 50);
+  ctx.fillText("BUTTON / RDDT: ONE PRESS FOREVER", 80, HEIGHT - 50);
 }
 
 /** Renders the identity card to an offscreen canvas and triggers a browser download
