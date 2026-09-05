@@ -74,7 +74,7 @@ Repository layout:
 : The original onchain experiment, now operated only from `/admin`. The starter can only call `start()` once, ever. The starter can also call `resetTimer()` any number of times, but only while the experiment is alive — it can never revive one that has already ended, and it never touches press history. See [Contract rules](#contract-rules-admin-only-now).
 
 `web/api/`
-: The database-backed game regular visitors actually play. `_db.ts` (shared Postgres query helpers, schema types), `schema.sql` (the two-table schema — `game_state`, `presses`), `state.ts`/`press.ts`/`history.ts`/`stats.ts` (public, unauthenticated routes), `admin.ts` (start/reset, gated by `middleware.ts`'s Basic Auth). `press.test.ts` runs real integration tests against this layer directly against Postgres — see [Testing](#testing).
+: The database-backed game regular visitors actually play. `_db.ts` (shared Postgres query helpers, schema types), `schema.sql` (the two-table schema — `game_state`, `presses`), `state.ts`/`press.ts`/`history.ts`/`stats.ts` (public, unauthenticated routes), `admin.ts` (start/reset, gated by `middleware.ts`'s Basic Auth). `_press.test.ts` runs real integration tests against this layer directly against Postgres — see [Testing](#testing).
 
 `web/middleware.ts`
 : Vercel Edge Middleware gating `/admin` and `/api/admin` behind Basic Auth, checked before the SPA or the API route ever runs. See `SECURITY.md`.
@@ -185,7 +185,7 @@ cd contracts && forge test -vvv
 # Frontend unit/integration tests: pure domain logic, config parsing, the
 # IndexedDB event store (still used by the admin-side legacy chain pages),
 # the reorg-safety sync/reconciliation logic, the admin middleware's auth
-# logic, and — the one real-database exception — web/api/press.test.ts,
+# logic, and — the one real-database exception — web/api/_press.test.ts,
 # which runs directly against Postgres (start/reset, one-press-per-username
 # case-insensitively, faction assignment, rejection after death), never
 # mocked, and cleans up every row it touches
@@ -197,7 +197,7 @@ cd web && npm test
 # Playwright's own webServer is plain Vite, which never serves web/api/*, so
 # admin.spec.ts mocks the /api/admin call itself (asserting the request body
 # sent, not just the copy) while still exercising the real onchain half —
-# see that file's own comments for why, and web/api/press.test.ts above for
+# see that file's own comments for why, and web/api/_press.test.ts above for
 # where the real database side is actually proven
 cd web && npm run test:e2e
 

@@ -19,7 +19,7 @@ loadLocalEnv();
 
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 if (!hasDatabase) {
-  console.warn("SKIPPING api/press.test.ts — no DATABASE_URL (run `vercel env pull web/.env.vercel --environment=production` locally to enable).");
+  console.warn("SKIPPING api/_press.test.ts — no DATABASE_URL (run `vercel env pull web/.env.vercel --environment=production` locally to enable).");
 }
 
 describe.skipIf(!hasDatabase)("database-backed game API (real Neon database)", () => {

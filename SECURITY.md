@@ -299,7 +299,7 @@ press, keyed by username).
   isn't currently alive — the same "can never revive a dead experiment" property,
   just enforced by an application-level check against `game_state.deadline`
   instead of a Solidity `require`.
-- Verified directly against a real database, not mocked: `web/api/press.test.ts`
+- Verified directly against a real database, not mocked: `web/api/_press.test.ts`
   runs the actual handler functions against real Postgres (start-once, one-press-
   per-username case-insensitively, faction assignment, rejection before start and
   after death, state consistency), cleaning up every row it creates.
@@ -488,7 +488,7 @@ begins the instant that happens, and there is no second run.
 
 - run the full Foundry test suite (`cd contracts && forge test -vv`)
 - run the frontend unit/integration suite (`cd web && npm test`) — includes
-  `web/api/press.test.ts` against a real database
+  `web/api/_press.test.ts` against a real database
 - run the end-to-end suite against a real local chain (`cd web && npm run test:e2e`)
 - deploy to Robinhood Chain testnet
 - run the complete live → press → reset → expiry lifecycle with multiple wallets
