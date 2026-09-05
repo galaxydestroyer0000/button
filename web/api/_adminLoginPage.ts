@@ -11,6 +11,8 @@ export function renderAdminLoginPage(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Admin sign in: BUTTON / RDDT</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
 <style>
   * { box-sizing: border-box; }
   html, body { height: 100%; }
