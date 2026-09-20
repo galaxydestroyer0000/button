@@ -1,4 +1,4 @@
-.grid { display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid #292929; }
+.grid { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid #292929; }
 .grid article { min-height: 250px; padding: 26px; border-right: 1px solid #292929; }
 .grid article:last-child { border-right: 0; }
 .grid b { color: var(--red); font: 800 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
@@ -10,14 +10,11 @@
 .eyebrow { color: var(--red); font-size: 9px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .12em; }
 
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-  .grid article:nth-child(2) { border-right: 0; }
-  .grid article:nth-child(-n+2) { border-bottom: 1px solid #292929; }
-}
-@media (max-width: 640px) {
   .grid { grid-template-columns: 1fr; }
   .grid article { min-height: 195px; border-right: 0; border-bottom: 1px solid #292929; }
   .grid article:last-child { border-bottom: 0; }
   .grid h3 { margin-top: 42px; }
+}
+@media (max-width: 640px) {
   .head, .fineprint { padding-left: 18px; padding-right: 18px; }
 }
