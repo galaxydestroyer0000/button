@@ -453,16 +453,17 @@ function TokenCAControls() {
 
   return (
     <div className={styles.scheduleCard}>
-      <h3>Token contract address</h3>
+      <h3>Token contract address (Solana)</h3>
       <p>
-        Shown in full, with a copy button, in the banner at the very top of every page. Leave it empty and the banner
-        reads "NOT LAUNCHED" instead. Takes effect immediately for every visitor, no redeploy.
+        The token's Solana mint address, shown in full with a copy button in the banner at the very top of every page.
+        Must be a valid Solana address (base58, 32 to 44 characters). Leave it empty and the banner reads "NOT LAUNCHED"
+        instead. Takes effect immediately for every visitor, no redeploy.
       </p>
       <div className={styles.scheduleForm}>
         <input
           type="text"
           className={styles.tokenCaInput}
-          placeholder="0x… (leave empty for NOT LAUNCHED)"
+          placeholder="Solana address (leave empty for NOT LAUNCHED)"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />

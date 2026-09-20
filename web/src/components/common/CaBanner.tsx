@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useGameState } from "../../hooks/useGameState";
 import styles from "./CaBanner.module.css";
 
-/** Site-wide, sticky-top banner showing the $BUTTON token's contract address —
+/** Site-wide, sticky-top banner showing the $BUTTON token's Solana contract address —
  *  deliberately the first thing on every page, not just the homepage, so a
  *  visitor checking a shared /wallet or /press link sees it too. The address
  *  itself is operator-set from /admin (see AdminPage.tsx's "Token contract"
@@ -17,7 +17,7 @@ export default function CaBanner() {
   if (!tokenCA) {
     return (
       <div className={`${styles.banner} ${styles.notLaunched}`}>
-        <span className={styles.label}>CA</span>
+        <span className={styles.label}>SOLANA CA</span>
         <span>NOT LAUNCHED</span>
       </div>
     );
@@ -36,7 +36,7 @@ export default function CaBanner() {
 
   return (
     <div className={styles.banner}>
-      <span className={styles.label}>CA</span>
+      <span className={styles.label}>SOLANA CA</span>
       <button type="button" className={styles.address} onClick={copyCA}>
         {tokenCA} · {copied ? "COPIED" : "COPY"}
       </button>

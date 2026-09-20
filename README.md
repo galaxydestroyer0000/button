@@ -10,6 +10,8 @@ BUTTON is a social experiment inspired by Reddit's 2015 **The Button**. A single
 
 A small Vercel-hosted app: a Postgres database holds the actual shared game (who's pressed, the countdown, faction history) behind a handful of API routes (`web/api/`), and a frontend that talks only to those routes for a regular visitor — no wallet, no gas, no transaction. Sitting alongside it, unconnected to what visitors experience, is the original smart contract (`ButtonExperiment.sol`) — still real, still deployed, still immutable — which only the operator's `/admin` page touches now, with a real wallet, for its own record-keeping.
 
+The BUTTON token launches on **Solana**. Its mint address is set live from `/admin` (no redeploy) and shown in full, with a copy button, in a banner at the top of every page; until then the banner reads "NOT LAUNCHED". The operator's `/admin` wallet and the original `ButtonExperiment.sol` contract stay on Robinhood Chain, unrelated to the token's chain.
+
 The BUTTON token is deliberately **not** used for access, rewards, yield, prizes, or governance of the experiment. The token is the cultural layer; the experiment is the experiment. Holding, trading, or not holding BUTTON has zero effect on whether a username can press, when it presses, or what faction it lands in.
 
 ## Why it exists

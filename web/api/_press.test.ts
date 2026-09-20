@@ -129,14 +129,16 @@ describe.skipIf(!hasDatabase)("database-backed game API (real Neon database)", (
   });
 
   it("sets, updates, and clears the token contract address", async () => {
+    // Wrapped SOL's mint: a real, well-known 43-character Solana address.
+    const solanaAddress = "So11111111111111111111111111111111111111112";
     const set = mockRes();
-    await admin(mockReq("POST", { action: "setTokenCA", value: "0xTestTokenAddress" }), set);
+    await admin(mockReq("POST", { action: "setTokenCA", value: solanaAddress }), set);
     expect(set.statusCode).toBe(200);
-    expect((set.body as { tokenCA: string }).tokenCA).toBe("0xTestTokenAddress");
+    expect((set.body as { tokenCA: string }).tokenCA).toBe(solanaAddress);
 
     const afterSet = mockRes();
     await state(mockReq("GET"), afterSet);
-    expect((afterSet.body as { tokenCA: string | null }).tokenCA).toBe("0xTestTokenAddress");
+    expect((afterSet.body as { tokenCA: string | null }).tokenCA).toBe(solanaAddress);
 
     const cleared = mockRes();
     await admin(mockReq("POST", { action: "setTokenCA", value: "  " }), cleared);
@@ -146,6 +148,18 @@ describe.skipIf(!hasDatabase)("database-backed game API (real Neon database)", (
     const afterClear = mockRes();
     await state(mockReq("GET"), afterClear);
     expect((afterClear.body as { tokenCA: string | null }).tokenCA).toBeNull();
+  });
+
+  it("rejects a token address that is not a valid Solana address", async () => {
+    for (const bad of ["0x1234567890abcdef1234567890abcdef12345678", "too-short", "0OIl0OIl0OIl0OIl0OIl0OIl0OIl0OIl0OIl0OIl"]) {
+      const res = mockRes();
+      await admin(mockReq("POST", { action: "setTokenCA", value: bad }), res);
+      expect(res.statusCode).toBe(400);
+      expect((res.body as { error: string }).error).toBe("INVALID_SOLANA_ADDRESS");
+    }
+    const after = mockRes();
+    await state(mockReq("GET"), after);
+    expect((after.body as { tokenCA: string | null }).tokenCA).toBeNull();
   });
 
   it("state reflects everything the above did", async () => {

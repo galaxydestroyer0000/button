@@ -1,13 +1,16 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sql, WINDOW_SECONDS, getGameState, isAlive } from "./_db.js";
 
-const TOKEN_CA_MAX_LENGTH = 200;
+/** A Solana address is a base58-encoded 32-byte public key: 32 to 44 characters
+ *  from the base58 alphabet (no 0, O, I, or l). This checks shape only, not that
+ *  the address is a real mint. */
+const SOLANA_ADDRESS_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
 /** The database-backed equivalent of start()/resetTimer() — called by
  *  AdminPage right after the real onchain transaction succeeds, so one click
  *  drives both the (now mostly symbolic) contract and the actual game users
  *  see. Also carries the one action with no onchain counterpart at all,
- *  setTokenCA, which just writes the operator-supplied token contract address
+ *  setTokenCA, which just writes the operator-supplied Solana token contract address
  *  users see in the site-wide CA banner. Protected by web/middleware.ts's
  *  session-cookie gate, same as /admin itself — see the matcher there for
  *  exactly what's covered. */
@@ -25,8 +28,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (action === "setTokenCA") {
     const raw = typeof req.body?.value === "string" ? req.body.value.trim() : "";
-    if (raw.length > TOKEN_CA_MAX_LENGTH) {
-      res.status(400).json({ error: "TOKEN_CA_TOO_LONG", message: `MUST BE ${TOKEN_CA_MAX_LENGTH} CHARACTERS OR FEWER.` });
+    if (raw.length > 0 && !SOLANA_ADDRESS_PATTERN.test(raw)) {
+      res.status(400).json({ error: "INVALID_SOLANA_ADDRESS", message: "NOT A VALID SOLANA ADDRESS. EXPECTED 32 TO 44 BASE58 CHARACTERS." });
       return;
     }
     const tokenCA = raw.length > 0 ? raw : null;

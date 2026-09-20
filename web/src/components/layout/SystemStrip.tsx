@@ -1,25 +1,19 @@
 import styles from "./SystemStrip.module.css";
-import { runtimeConfig } from "../../config/runtimeConfig";
-import type { ExperimentState } from "../../domain/types";
+import { useGameState } from "../../hooks/useGameState";
 
-export default function SystemStrip({ state }: { state: ExperimentState }) {
-  const experimentStateLabel = runtimeConfig.previewMode
-    ? "PREVIEW"
-    : !state.loaded
-      ? "LOADING"
-      : !state.started
-        ? "SEALED"
-        : state.alive
-          ? "LIVE"
-          : "ENDED";
+/** Footer strip on every page. Reads the database-backed game, which is what a
+ *  visitor actually plays, not the operator's Robinhood Chain contract (that only
+ *  /admin touches now). The token itself launches on Solana. */
+export default function SystemStrip() {
+  const state = useGameState();
+
+  const stateLabel = !state.loaded ? "LOADING" : !state.started ? "SEALED" : state.alive ? "LIVE" : "ENDED";
 
   return (
     <footer className={styles.strip}>
-      <span>CHAIN <code>{runtimeConfig.previewMode ? "N/A" : runtimeConfig.network.name.toUpperCase()}</code></span>
-      <span>DEPLOY BLOCK <code>{runtimeConfig.raw.contractDeployBlock || "N/A"}</code></span>
-      <span>LATEST BLOCK <code>{runtimeConfig.previewMode ? "N/A" : state.currentBlock || "N/A"}</code></span>
-      <span>UNIQUE PARTICIPANTS <code>{runtimeConfig.previewMode ? "N/A" : state.totalPresses.toLocaleString()}</code></span>
-      <span>STATE <code>{experimentStateLabel}</code></span>
+      <span>TOKEN CHAIN <code>SOLANA</code></span>
+      <span>UNIQUE PARTICIPANTS <code>{state.loaded ? state.totalPresses.toLocaleString() : "N/A"}</code></span>
+      <span>STATE <code>{stateLabel}</code></span>
     </footer>
   );
 }

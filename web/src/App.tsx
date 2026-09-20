@@ -45,7 +45,7 @@ export default function App() {
   const sync = useEventSync(state);
 
   return (
-    <AppShell footer={<SystemStrip state={state} />}>
+    <AppShell footer={<SystemStrip />}>
       <GlobalPulse pulseEvent={sync.pulseEvent} />
       <Routes>
         <Route path="/" element={<HomePage />} />
